@@ -49,9 +49,6 @@ namespace Hostel_Management.Controllers
         public IActionResult Create()
         {
             ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Id");
-            ViewData["RoomTypeList"] = new SelectList(Enum.GetValues(typeof(RoomType)));
-            ViewData["StatusList"] = new SelectList(Enum.GetValues(typeof(RoomStatus)));
-
             return View();
         }
 
@@ -60,7 +57,7 @@ namespace Hostel_Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FloorId,RoomNumber,RoomType,Capacity,Status,CreatedAt")] Room room)
+        public async Task<IActionResult> Create([Bind("Id,FloorId,RoomNumber,Capacity,CreatedAt")] Room room)
         {
             if (ModelState.IsValid)
             {
@@ -68,7 +65,7 @@ namespace Hostel_Management.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Id", room.FloorId);
+            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Name", room.FloorId);
             return View(room);
         }
 
@@ -85,7 +82,7 @@ namespace Hostel_Management.Controllers
             {
                 return NotFound();
             }
-            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Id", room.FloorId);
+            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Name", room.FloorId);
             return View(room);
         }
 
@@ -94,7 +91,7 @@ namespace Hostel_Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FloorId,RoomNumber,RoomType,Capacity,Status,CreatedAt")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FloorId,RoomNumber,Capacity,CreatedAt")] Room room)
         {
             if (id != room.Id)
             {
@@ -121,7 +118,7 @@ namespace Hostel_Management.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Id", room.FloorId);
+            ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Name", room.FloorId);
             return View(room);
         }
 

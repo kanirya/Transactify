@@ -5,8 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hostel_Management.Models
 {
-    public enum RoomType { Single, Double, Shared }
-    public enum RoomStatus { Available, Occupied, Maintenance }
     public enum Gender { Male, Female, Other }
     public enum BookingStatus { Active, Completed, Cancelled }
     public enum PaymentMethod { Cash, BankTransfer, Online }
@@ -28,7 +26,6 @@ namespace Hostel_Management.Models
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Room> Rooms { get; set; } = new List<Room>();
     }
 
     public class Room
@@ -43,20 +40,14 @@ namespace Hostel_Management.Models
         [MaxLength(10)]
         public string RoomNumber { get; set; }
 
-        [Required]
-        public RoomType RoomType { get; set; }
-
         [Range(1, 10)]
         public int Capacity { get; set; }
-
-        [Required]
-        public RoomStatus Status { get; set; } = RoomStatus.Available;
 
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public Floor Floor { get; set; }
-        public ICollection<Student> Students { get; set; } = new List<Student>();
+
     }
 
     public class Student

@@ -4,6 +4,7 @@ using Hostel_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hostel_Management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250220214829_Delete some room data")]
+    partial class Deletesomeroomdata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,9 +104,6 @@ namespace Hostel_Management.Migrations
                     b.Property<int?>("RequestedBy")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RequestedStudentId")
-                        .HasColumnType("int");
-
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
@@ -112,7 +112,7 @@ namespace Hostel_Management.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RequestedStudentId");
+                    b.HasIndex("RequestedBy");
 
                     b.HasIndex("RoomId");
 
@@ -244,7 +244,8 @@ namespace Hostel_Management.Migrations
                 {
                     b.HasOne("Hostel_Management.Models.Student", "RequestedStudent")
                         .WithMany()
-                        .HasForeignKey("RequestedStudentId");
+                        .HasForeignKey("RequestedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Hostel_Management.Models.Room", "Room")
                         .WithMany()
@@ -271,7 +272,7 @@ namespace Hostel_Management.Migrations
             modelBuilder.Entity("Hostel_Management.Models.Room", b =>
                 {
                     b.HasOne("Hostel_Management.Models.Floor", "Floor")
-                        .WithMany()
+                        .WithMany("Rooms")
                         .HasForeignKey("FloorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -282,10 +283,21 @@ namespace Hostel_Management.Migrations
             modelBuilder.Entity("Hostel_Management.Models.Student", b =>
                 {
                     b.HasOne("Hostel_Management.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId");
+                        .WithMany("Students")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("Hostel_Management.Models.Floor", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("Hostel_Management.Models.Room", b =>
+                {
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }
