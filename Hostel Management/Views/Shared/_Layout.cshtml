@@ -3,34 +3,39 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Muhammad Danish" />
+    <meta name="description" content="This App is for hostel management system." />
     <title>@ViewData["Title"] - Hostel_Management</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Hostel_Management</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
+    <div class="appbar d-flex align-items-center px-3" style="height: 45px;  color: white;">
+        <button class="toggle-btn btn btn-close text-black me-3" onclick="toggleSidebar()" style="border: none; ">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <h5 class="p-2">Hostel Management</h5>
+    </div>
+    
+<div class="main-container d-flex">
+        <div class="sidebar  " id="side_nav">
+            <ul class="menu list-unstyled">
+                <li><a href="/" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-home me-2"></i> Dashboard</a></li>
+                <li><a href="/Floors" class="d-flex align-items-center text-decoration-none text-black "><i class=" fa-solid fa-bars-staggered me-2"></i> Floors</a></li>
+                <li><a href="/Category" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-arrow-right-arrow-left me-2"></i> Expenses</a></li>
+                <li><a href="/Product" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-boxes-stacked me-2"></i> Inventory</a></li>
+                <li><a href="/Employee" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Employee</a></li>
+                <li><a href="/hostelRooms" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-bed me-2"></i> Hostel</a></li>
+                <li><a href="/Users" class="d-flex align-items-center text-decoration-none text-black "><i class="fa-solid fa-users me-2"></i> Users</a></li>
+                <li><a href="/Settings" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-gear me-2"></i> Settings</a></li>
+            </ul>
+        </div>
+</div>
+    <div class="container" style="margin-top:50px";>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -41,6 +46,27 @@
             &copy; 2025 - Hostel_Management - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <script>
+                document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.querySelector(".toggle-btn");
+            const sidebar = document.querySelector(".sidebar");
+
+            toggleButton.addEventListener("click", function () {
+                sidebar.classList.toggle("active");
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove("active");
+                }
+            });
+        });
+
+
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

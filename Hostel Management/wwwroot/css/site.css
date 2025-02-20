@@ -1,22 +1,88 @@
+:root {
+    --white: #fff;
+    --background: #F4F4F4;
+    --blue-medium: #BCCCDC;
+    --dark-blue: #4A5568;
+    --text-black: #000;
+}
+
+/* General Styles */
 html {
-  font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* App Bar */
+.appbar {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .appbar h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+/* Toggle Button */
+.toggle-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.3rem;
+    cursor: pointer;
 }
 
-body {
-  margin-bottom: 60px;
+/* Sidebar */
+.sidebar {
+    width: 140px;
+    background-color: var(--white);
+    color: var(--text-black);
+    height: 70vh; /* 80% of screen height */
+    position: fixed;
+    left: -140px; /* Initially hidden */
+    top: 60px; /* Adjust based on app bar */
+    transition: left 0.3s ease-in-out;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-top: 10px;
 }
+
+    .sidebar.active {
+        left: 0px; /* Adjusted to make it more visible */
+    }
+
+    /* Sidebar Navigation */
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .sidebar ul li {
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+
+            .sidebar ul li:hover {
+                background: var(--blue-medium);
+            }
