@@ -49,6 +49,9 @@ namespace Hostel_Management.Controllers
         public IActionResult Create()
         {
             ViewData["FloorId"] = new SelectList(_context.Floors, "Id", "Id");
+            ViewData["RoomTypeList"] = new SelectList(Enum.GetValues(typeof(RoomType)));
+            ViewData["StatusList"] = new SelectList(Enum.GetValues(typeof(RoomStatus)));
+
             return View();
         }
 
