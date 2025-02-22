@@ -1,0 +1,66 @@
+﻿@{
+	Layout = null;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Muhammad Danish" />
+    <meta name="description" content="This App is for hostel management system." />
+    <title>@ViewData["Title"] - Hostel_Management</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+
+	<div class="row justify-content-center">
+		<div class="col-5 mt-5">
+			<div class="card login-logout-card">
+				<div class="card-header">
+					<ul class="nav nav-tabs card-header-tabs">
+						<li class="nav-item">
+
+							<a class="nav-link" href="/Identity/Account/Login">
+								Login
+							</a>
+						</li>
+						<li class="nav-item">
+
+							<a class="nav-link" href="/Identity/Account/Register">
+								Register
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="row justify-content-center ">
+						<div class="col-10 my-10">
+							@RenderBody()
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+ 
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+
+@section Scripts{
+	@await RenderSectionAsync("Scripts", required: false)
+}

@@ -1,12 +1,19 @@
-using Hostel_Management.Data;
+using Hostel_Management.Models;
 using Microsoft.EntityFrameworkCore;
+using Hostel_Management.Data;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("TransactionPortal") ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
+
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AuthDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<ApplicationDbContext>(options => 
-options.UseSqlServer(builder.Configuration.GetConnectionString("hostelPortal")));
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -24,8 +31,10 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
 
 app.Run();

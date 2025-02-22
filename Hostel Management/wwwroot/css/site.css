@@ -10,6 +10,7 @@
 html {
     font-family: "Poppins", sans-serif;
     font-size: 14px;
+    background-color:var(--background)
 }
 
 @media (min-width: 768px) {
@@ -86,3 +87,59 @@ html {
             .sidebar ul li:hover {
                 background: var(--blue-medium);
             }
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Poppins";
+    font-size: 14px;
+    color: #333;
+}
+
+    .custom-table thead tr {
+        background-color: #009879;
+        color: #ffffff;
+        text-align: left;
+    }
+
+/* Table body styling */
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+    /* Zebra striping for table rows */
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    /* Hover effect for table rows */
+    .styled-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+/* Cell padding */
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+}
+
+
+.login-logout-card .card-header{
+    padding:0px 0px 12px 0px;
+}
+.login-logout-card ul.nav-tabs{
+    margin:0px 0px -12px 0px;
+}
+
+.login-logout-card li.nav-item{
+    width:50%;
+}
+
+.login-logout-card a.nav-link{
+    font-size:1rem;
+    color:#495057;
+    text-align:center;
+    padding:1rem;
+}
+login-logout-card .card-body{
+    padding:10px 20px;
+}
