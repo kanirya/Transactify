@@ -78,6 +78,7 @@ namespace Hostel_Management.Controllers
             }
               
             
+
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code", account.CurrencyId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", account.UserId);
             return View(account);
