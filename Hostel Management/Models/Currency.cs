@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Hostel_Management.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 
 public class Currency
@@ -31,7 +32,7 @@ public class Account
     public string UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public IdentityUser User { get; set; }
+    public ApplicationUser User { get; set; }
 
     [Required]
     public int CurrencyId { get; set; }
@@ -43,8 +44,6 @@ public class Account
     [DataType(DataType.Currency)]
     public decimal Balance { get; set; }
 
-    public ICollection<Transaction> TransactionsSent { get; set; }
-    public ICollection<Transaction> TransactionsReceived { get; set; }
 }
 
 public class Transaction
@@ -55,14 +54,10 @@ public class Transaction
     [Required]
     public int SenderAccountId { get; set; }
 
-    [ForeignKey("SenderAccountId")]
-    public Account SenderAccount { get; set; }
+
 
     [Required]
-    public int ReceiverAccountId { get; set; }
-
-    [ForeignKey("ReceiverAccountId")]
-    public Account ReceiverAccount { get; set; }
+    public string ReceiverAccountId { get; set; }
 
     [Required]
     [DataType(DataType.Currency)]
