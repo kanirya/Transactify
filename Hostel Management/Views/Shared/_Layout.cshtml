@@ -14,11 +14,12 @@
     <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="appbar d-flex align-items-center px-3" style="height: 45px;  color: white;">
+    <div class="appbar d-flex align-items-center " style="height: 45px;  color: white;">
         <button class="toggle-btn btn btn-close text-black me-3" onclick="toggleSidebar()" style="border: none; ">
             <i class="fa-solid fa-bars"></i>
         </button>
         <h5 class="p-2">Hostel Management</h5>
+        <partial name="_LoginPartial.cshtml" />
 
     </div>
     
@@ -26,8 +27,8 @@
         <div class="sidebar  " id="side_nav">
             <ul class="menu list-unstyled">
                 <li><a href="/" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-home me-2"></i> Dashboard</a></li>
-                <li><a href="/Floors" class="d-flex align-items-center text-decoration-none text-black "><i class=" fa-solid fa-bars-staggered me-2"></i> Floors</a></li>
-                <li><a href="/Rooms" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-bed me-2"></i> Rooms</a></li>
+                <li><a href="/Currencies" class="d-flex align-items-center text-decoration-none text-black "><i class="fa-solid fa-dollar-sign me-2"></i> Currencies</a></li>
+                <li><a href="/Accounts" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-vault me-2"></i> Accounts</a></li>
                 <li><a href="/Product" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-boxes-stacked me-2"></i> Inventory</a></li>
                 <li><a href="/Employee" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Employee</a></li>
                 <li><a href="/hostelRooms" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-bed me-2"></i> Hostel</a></li>
@@ -36,17 +37,11 @@
             </ul>
         </div>
 </div>
-    <div class="container" style="margin-top:50px";>
+    <div class="container" style="margin-top:50px;height:100%;";>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Hostel_Management - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
 
     <script>
                 document.addEventListener("DOMContentLoaded", function () {

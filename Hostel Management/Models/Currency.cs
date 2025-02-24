@@ -2,22 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-public class ApplicationUserModel
-{
-    [Key]
-    public string Id { get; set; }
-
-    [Required]
-    [StringLength(256)]
-    public string UserName { get; set; }
-
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
-
-    public ICollection<Account> Accounts { get; set; }
-}
+using Microsoft.AspNetCore.Identity;
 
 public class Currency
 {
@@ -46,7 +31,7 @@ public class Account
     public string UserId { get; set; }
 
     [ForeignKey("UserId")]
-    //public ApplicationUser User { get; set; }
+    public IdentityUser User { get; set; }
 
     [Required]
     public int CurrencyId { get; set; }
