@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hostel_Management.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250225194735_Remove relations")]
-    partial class Removerelations
+    [Migration("20250225200459_Intial commets")]
+    partial class Intialcommets
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
