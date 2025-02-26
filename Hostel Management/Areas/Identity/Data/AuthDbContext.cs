@@ -1,4 +1,5 @@
 ﻿using Hostel_Management.Areas.Identity.Data;
+using Hostel_Management.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,5 +16,7 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Currency> Currencies { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products { get; set; }
 
 }

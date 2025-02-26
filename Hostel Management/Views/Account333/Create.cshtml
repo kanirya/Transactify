@@ -1,0 +1,51 @@
+﻿@model Account
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h2 class="text-center mb-4">Create Account</h2>
+                <form asp-action="Create" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <!-- Account Name -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="AccountName" class="form-control" placeholder="Enter account name" />
+                        <label asp-for="AccountName"></label>
+                        <span asp-validation-for="AccountName" class="text-danger"></span>
+                    </div>
+
+                    <div class="my-1">
+                        <select asp-for="CurrencyId" asp-items="ViewBag.Currencies" class="form-control">
+                            <option value="">Select Currency</option>
+                        </select>
+                        <span asp-validation-for="CurrencyId" class="text-danger ms-1"></span>
+                    </div>
+
+                    <!-- Currency Selection -->
+               
+                    <!-- Balance -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Balance" type="number" step="0.01" class="form-control" placeholder="Enter balance" />
+                        <label asp-for="Balance"></label>
+                        <span asp-validation-for="Balance" class="text-danger"></span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary w-100">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

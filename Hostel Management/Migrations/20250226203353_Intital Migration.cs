@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hostel_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class Intialcommets : Migration
+    public partial class IntitalMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -194,10 +194,10 @@ namespace Hostel_Management.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccountName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CurrencyId = table.Column<int>(type: "int", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    CurrencyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

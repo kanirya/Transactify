@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hostel_Management.Controllers
 {
+
+
+
     [Authorize]
     public class HomeController : Controller
     {

@@ -19,31 +19,26 @@ public class Currency
     public string Name { get; set; }
 }
 
+
 public class Account
 {
     [Key]
     public int Id { get; set; }
 
     [Required]
-    [StringLength(100)]
     public string AccountName { get; set; }
 
     [Required]
-    public string UserId { get; set; }
+    [Range(0, double.MaxValue, ErrorMessage = "Balance must be 0 or greater.")]
+    public decimal Balance { get; set; }
 
-    [ForeignKey("UserId")]
+    [Required]
+    public string UserId { get; set; }
     public ApplicationUser User { get; set; }
 
     [Required]
     public int CurrencyId { get; set; }
-
-    [ForeignKey("CurrencyId")]
-    public Currency Currency { get; set; }
-
-    [Required]
-    [DataType(DataType.Currency)]
-    public decimal Balance { get; set; }
-
+    public  Currency Currency { get; set; }
 }
 
 public class Transaction
@@ -53,8 +48,6 @@ public class Transaction
 
     [Required]
     public int SenderAccountId { get; set; }
-
-
 
     [Required]
     public string ReceiverAccountId { get; set; }

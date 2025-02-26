@@ -6,27 +6,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
-using Microsoft.AspNetCore.Authorization;
+using Hostel_Management.Models;
 
 namespace Hostel_Management.Controllers
 {
-    [Authorize]
-    public class CurrenciesController : Controller
+    public class CategoriesController : Controller
     {
         private readonly AuthDbContext _context;
 
-        public CurrenciesController(AuthDbContext context)
+        public CategoriesController(AuthDbContext context)
         {
             _context = context;
         }
 
-        // GET: Currencies
+        // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Currencies.ToListAsync());
+            return View(await _context.Categories.ToListAsync());
         }
 
-        // GET: Currencies/Details/5
+        // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,39 +33,48 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies
+            var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (currency == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(currency);
+            return View(category);
         }
 
-        // GET: Currencies/Create
+        // GET: Categories/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Currencies/Create
+        // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,Name")] Currency currency)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(currency);
-                await _context.SaveChangesAsync();
+                _context.Add(category);
+                int changes = await _context.SaveChangesAsync();
+                Console.WriteLine($"Rows affected: {changes}");
+
+                if (changes == 0)
+                {
+                    Console.WriteLine("Database did not save the record.");
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(currency);
+            Console.WriteLine("Model is invalid");
+            return View(category);
         }
 
-        // GET: Currencies/Edit/5
+
+        // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,22 +82,22 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies.FindAsync(id);
-            if (currency == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
-            return View(currency);
+            return View(category);
         }
 
-        // POST: Currencies/Edit/5
+        // POST: Categories/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Name")] Currency currency)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
         {
-            if (id != currency.Id)
+            if (id != category.Id)
             {
                 return NotFound();
             }
@@ -98,12 +106,12 @@ namespace Hostel_Management.Controllers
             {
                 try
                 {
-                    _context.Update(currency);
+                    _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CurrencyExists(currency.Id))
+                    if (!CategoryExists(category.Id))
                     {
                         return NotFound();
                     }
@@ -114,10 +122,10 @@ namespace Hostel_Management.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(currency);
+            return View(category);
         }
 
-        // GET: Currencies/Delete/5
+        // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,34 +133,34 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies
+            var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (currency == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(currency);
+            return View(category);
         }
 
-        // POST: Currencies/Delete/5
+        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var currency = await _context.Currencies.FindAsync(id);
-            if (currency != null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
             {
-                _context.Currencies.Remove(currency);
+                _context.Categories.Remove(category);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CurrencyExists(int id)
+        private bool CategoryExists(int id)
         {
-            return _context.Currencies.Any(e => e.Id == id);
+            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }
