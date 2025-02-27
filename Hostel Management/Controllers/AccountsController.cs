@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
+using Hostel_Management.Models.DTOs;
 
 namespace Hostel_Management.Controllers
 {
@@ -58,14 +59,25 @@ namespace Hostel_Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AccountName,Balance,UserId,CurrencyId")] Account account)
+        public async Task<IActionResult> Create(AccountDTO accountDto)
         {
+            var account= new Account();
             if (ModelState.IsValid)
             {
-                _context.Add(account);
+                account = new Account
+                {
+                    AccountName = accountDto.AccountName,
+                    Balance = accountDto.Balance,
+                    UserId = accountDto.UserId, // Just set the foreign key
+                    CurrencyId = accountDto.CurrencyId // Just set the foreign key
+                };
+                if (ModelState.IsValid)
+                    _context.Add(account);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+              
+            
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code", account.CurrencyId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", account.UserId);
             return View(account);

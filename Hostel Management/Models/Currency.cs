@@ -31,14 +31,18 @@ public class Account
     [Required]
     [Range(0, double.MaxValue, ErrorMessage = "Balance must be 0 or greater.")]
     public decimal Balance { get; set; }
-
     [Required]
+    [ForeignKey("UserId")]
     public string UserId { get; set; }
     public ApplicationUser User { get; set; }
 
     [Required]
+    [ForeignKey("CurrencyId")]
     public int CurrencyId { get; set; }
-    public  Currency Currency { get; set; }
+    public Currency Currency { get; set; }
+
+
+  
 }
 
 public class Transaction
