@@ -7,23 +7,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.DTOs;
+using Hostel_Management.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
+
+
+
 
 namespace Hostel_Management.Controllers
 {
     public class AccountsController : Controller
     {
         private readonly AuthDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountsController(AuthDbContext context)
+        public AccountsController(AuthDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
 
         // GET: Accounts
         public async Task<IActionResult> Index()
         {
-            var authDbContext = _context.Accounts.Include(a => a.Currency).Include(a => a.User);
-            return View(await authDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            var accounts = _context.Accounts.Include(a => a.Currency).Where(a=>a.UserId==user.Id);
+            return View(await accounts.ToListAsync());
         }
 
         // GET: Accounts/Details/5
@@ -33,7 +42,7 @@ namespace Hostel_Management.Controllers
             {
                 return NotFound();
             }
-
+           
             var account = await _context.Accounts
                 .Include(a => a.Currency)
                 .Include(a => a.User)
@@ -50,7 +59,6 @@ namespace Hostel_Management.Controllers
         public IActionResult Create()
         {
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -61,23 +69,24 @@ namespace Hostel_Management.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AccountDTO accountDto)
         {
-            var account= new Account();
+           
+                  var user = await _userManager.GetUserAsync(User);
+            var account = new Account();
             if (ModelState.IsValid)
             {
                 account = new Account
                 {
                     AccountName = accountDto.AccountName,
                     Balance = accountDto.Balance,
-                    UserId = accountDto.UserId, // Just set the foreign key
-                    CurrencyId = accountDto.CurrencyId // Just set the foreign key
+                    UserId = user.Id,
+                    CurrencyId = accountDto.CurrencyId 
                 };
                 if (ModelState.IsValid)
                     _context.Add(account);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-              
-            
+
 
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code", account.CurrencyId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", account.UserId);
