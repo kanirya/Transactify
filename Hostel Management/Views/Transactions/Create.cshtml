@@ -1,4 +1,4 @@
-﻿@model Account
+﻿@model Hostel_Management.Models.Model.Transaction
 
 @{
     ViewData["Title"] = "Create";
@@ -7,24 +7,25 @@
 
 <h1>Create</h1>
 
-<h4>Account</h4>
+<h4>Transaction</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" name="Id" value="Id" />
             <div class="form-group">
-                <label asp-for="AccountName" class="control-label"></label>
-                <input asp-for="AccountName" class="form-control" />
-                <span asp-validation-for="AccountName" class="text-danger"></span>
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Balance" class="control-label"></label>
-                <input asp-for="Balance" class="form-control" />
-                <span asp-validation-for="Balance" class="text-danger"></span>
+                <label asp-for="FromAccountId" class="control-label"></label>
+                <select asp-for="FromAccountId" class ="form-control" asp-items="ViewBag.FromAccountId"></select>
             </div>
-          
+            <div class="form-group">
+                <label asp-for="ToAccountId" class="control-label"></label>
+                <select asp-for="ToAccountId" class ="form-control" asp-items="ViewBag.ToAccountId"></select>
+            </div>
             <div class="form-group">
                 <label asp-for="CurrencyId" class="control-label"></label>
                 <select asp-for="CurrencyId" class ="form-control" asp-items="ViewBag.CurrencyId"></select>

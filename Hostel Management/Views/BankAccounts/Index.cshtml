@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Account>
+﻿@model IEnumerable<Hostel_Management.Models.Model.BankAccount>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,12 +14,14 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.AccountName)
+                @Html.DisplayNameFor(model => model.AccountNumber)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Balance)
             </th>
-           
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Currency)
             </th>
@@ -30,19 +32,21 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
+                @Html.DisplayFor(modelItem => item.AccountNumber)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Balance)
             </td>
-           
             <td>
-                @Html.DisplayFor(modelItem => item.Currency.Code)
+                @Html.DisplayFor(modelItem => item.User.Id)
             </td>
             <td>
-                <a class=" btn btn-edit" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="btn btn-edit" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action=" btn btn-delete" asp-route-id="@item.Id">Delete</a>
+                @Html.DisplayFor(modelItem => item.Currency.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

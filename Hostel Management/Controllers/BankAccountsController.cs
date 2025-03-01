@@ -10,23 +10,23 @@ using Hostel_Management.Models.Model;
 
 namespace Hostel_Management.Controllers
 {
-    public class CurrenciesController : Controller
+    public class BankAccountsController : Controller
     {
         private readonly AuthDbContext _context;
 
-        public CurrenciesController(AuthDbContext context)
+        public BankAccountsController(AuthDbContext context)
         {
             _context = context;
         }
 
-        // GET: Currencies
+        // GET: BankAccounts
         public async Task<IActionResult> Index()
         {
-            var authDbContext = _context.Currencies.Include(c => c.User);
+            var authDbContext = _context.BankAccounts.Include(b => b.Currency).Include(b => b.User);
             return View(await authDbContext.ToListAsync());
         }
 
-        // GET: Currencies/Details/5
+        // GET: BankAccounts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +34,45 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies
-                .Include(c => c.User)
+            var bankAccount = await _context.BankAccounts
+                .Include(b => b.Currency)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (currency == null)
+            if (bankAccount == null)
             {
                 return NotFound();
             }
 
-            return View(currency);
+            return View(bankAccount);
         }
 
-        // GET: Currencies/Create
+        // GET: BankAccounts/Create
         public IActionResult Create()
         {
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name");
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Currencies/Create
+        // POST: BankAccounts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Symbol,ExchangeRate,UserId")] Currency currency)
+        public async Task<IActionResult> Create([Bind("Id,AccountNumber,Balance,UserId,CurrencyId")] BankAccount bankAccount)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(currency);
+                _context.Add(bankAccount);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name", bankAccount.CurrencyId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", bankAccount.UserId);
+            return View(bankAccount);
         }
 
-        // GET: Currencies/Edit/5
+        // GET: BankAccounts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +80,24 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies.FindAsync(id);
-            if (currency == null)
+            var bankAccount = await _context.BankAccounts.FindAsync(id);
+            if (bankAccount == null)
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name", bankAccount.CurrencyId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", bankAccount.UserId);
+            return View(bankAccount);
         }
 
-        // POST: Currencies/Edit/5
+        // POST: BankAccounts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Symbol,ExchangeRate,UserId")] Currency currency)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AccountNumber,Balance,UserId,CurrencyId")] BankAccount bankAccount)
         {
-            if (id != currency.Id)
+            if (id != bankAccount.Id)
             {
                 return NotFound();
             }
@@ -102,12 +106,12 @@ namespace Hostel_Management.Controllers
             {
                 try
                 {
-                    _context.Update(currency);
+                    _context.Update(bankAccount);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CurrencyExists(currency.Id))
+                    if (!BankAccountExists(bankAccount.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +122,12 @@ namespace Hostel_Management.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
+            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name", bankAccount.CurrencyId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", bankAccount.UserId);
+            return View(bankAccount);
         }
 
-        // GET: Currencies/Delete/5
+        // GET: BankAccounts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,35 +135,36 @@ namespace Hostel_Management.Controllers
                 return NotFound();
             }
 
-            var currency = await _context.Currencies
-                .Include(c => c.User)
+            var bankAccount = await _context.BankAccounts
+                .Include(b => b.Currency)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (currency == null)
+            if (bankAccount == null)
             {
                 return NotFound();
             }
 
-            return View(currency);
+            return View(bankAccount);
         }
 
-        // POST: Currencies/Delete/5
+        // POST: BankAccounts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var currency = await _context.Currencies.FindAsync(id);
-            if (currency != null)
+            var bankAccount = await _context.BankAccounts.FindAsync(id);
+            if (bankAccount != null)
             {
-                _context.Currencies.Remove(currency);
+                _context.BankAccounts.Remove(bankAccount);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CurrencyExists(int id)
+        private bool BankAccountExists(int id)
         {
-            return _context.Currencies.Any(e => e.Id == id);
+            return _context.BankAccounts.Any(e => e.Id == id);
         }
     }
 }

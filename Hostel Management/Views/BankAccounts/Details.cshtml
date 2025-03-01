@@ -1,4 +1,4 @@
-﻿@model Account
+﻿@model Hostel_Management.Models.Model.BankAccount
 
 @{
     ViewData["Title"] = "Details";
@@ -8,14 +8,14 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Account</h4>
+    <h4>BankAccount</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AccountName)
+            @Html.DisplayNameFor(model => model.AccountNumber)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AccountName)
+            @Html.DisplayFor(model => model.AccountNumber)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Balance)
@@ -33,7 +33,7 @@
             @Html.DisplayNameFor(model => model.Currency)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Currency.Code)
+            @Html.DisplayFor(model => model.Currency.Name)
         </dd>
     </dl>
 </div>
