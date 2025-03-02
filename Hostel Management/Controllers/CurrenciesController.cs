@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
+using Hostel_Management.Models.DTOs;
 
 namespace Hostel_Management.Controllers
 {
@@ -52,15 +53,20 @@ namespace Hostel_Management.Controllers
             return View();
         }
 
-        // POST: Currencies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Symbol,ExchangeRate,UserId")] Currency currency)
+        public async Task<IActionResult> Create(CurrencyDTO cur)
         {
+            Currency currency = new Currency();
+
             if (ModelState.IsValid)
             {
+               
+                currency.UserId = cur.UserId;
+                currency.Name = cur.Name;
+                currency.ExchangeRate = cur.ExchangeRate;
+                currency.Symbol= cur.Symbol;
+
                 _context.Add(currency);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

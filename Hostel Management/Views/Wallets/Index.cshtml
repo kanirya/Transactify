@@ -5,6 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+
+
+
+
 <h1>Index</h1>
 
 <p>
@@ -13,6 +18,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Owner)
             </th>
@@ -26,17 +34,33 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Owner.Id)
+                    @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ConnectedUser.Id)
+                @Html.DisplayFor(modelItem => item.Owner.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @Html.DisplayFor(modelItem => item.ConnectedUser.Name)
+            </td>
+            <td>
+                <a class="btn btn-edit" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a class="btn btn-edit" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a class="btn btn-delete" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+<div class="fixed-bottom-buttons">
+    <div class="container">
+        <div class="row row-buttons">
+
+            <div class="col-6">
+                <div class="create-tran-btn">Add Cash</div>
+            </div>
+            <div class="col-6">
+                <div class="create-tran-btn">Send Money</div>
+            </div>
+        </div>
+    </div>
+</div>

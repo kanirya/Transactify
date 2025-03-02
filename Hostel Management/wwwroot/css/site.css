@@ -4,6 +4,7 @@
     --blue-medium: #BCCCDC;
     --dark-blue: #4A5568;
     --text-black: #000;
+    --charcol-black: #36454F;
 }
 
 /* General Styles */
@@ -211,4 +212,37 @@ button {
 
 .btn-delete:hover {
     background: #C0392B;
+}
+.create-tran-btn {
+    background-color: var(--blue-medium);
+    color: var(--charcol-black);
+    cursor:pointer;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    width: 100%; /* Full width */
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+    .create-tran-btn:hover {
+        background-color: var(--dark-blue);
+        transform: scale(1.02); /* Slight lift effect */
+        color:var(--background)
+    }
+
+.fixed-bottom-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white; /* Keeps the bottom clean */
+    padding: 10px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Nice shadow effect */
+}
+
+.add-send-cash{
+    position:fixed;
+    bottom:0px;
 }

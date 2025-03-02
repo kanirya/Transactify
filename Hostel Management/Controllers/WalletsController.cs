@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
+using Hostel_Management.Models.DTOs;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
 
 namespace Hostel_Management.Controllers
 {
     public class WalletsController : Controller
     {
         private readonly AuthDbContext _context;
-
-        public WalletsController(AuthDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public WalletsController(AuthDbContext context ,UserManager<ApplicationUser>  userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Wallets
@@ -49,8 +53,7 @@ namespace Hostel_Management.Controllers
         // GET: Wallets/Create
         public IActionResult Create()
         {
-            ViewData["ConnectedUserId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["ConnectedUserId"] = new SelectList(_context.Users, "Id", "Name");
             return View();
         }
 
@@ -59,16 +62,21 @@ namespace Hostel_Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OwnerId,ConnectedUserId")] Wallet wallet)
+        public async Task<IActionResult> Create(WalletDTO wal)
         {
+            var wallet = new Wallet();
+            var user = await _userManager.GetUserAsync(User);
+
             if (ModelState.IsValid)
             {
+                wallet.Name = wal.Name;
+                wallet.OwnerId = user.Id ;
+                wallet.ConnectedUserId = wal.ConnectedUserId;
                 _context.Add(wallet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ConnectedUserId"] = new SelectList(_context.Users, "Id", "Id", wallet.ConnectedUserId);
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", wallet.OwnerId);
+            ViewData["ConnectedUserId"] = new SelectList(_context.Users, "Id", "Name", wallet.ConnectedUserId);
             return View(wallet);
         }
 

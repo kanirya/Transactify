@@ -2,37 +2,28 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Hostel_Management.Models.Model
+namespace Hostel_Management.Models.DTOs
 {
-    public class ExchangeModel
+
+    public class GeneralDTOs { }
+
+
+
+    public class WalletDTO
     {
-
-    }
-
-    public class Wallet
-    {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
-        [Required]
-
-        public string OwnerId { get; set; }
-        [ForeignKey("OwnerId")]
-        public virtual ApplicationUser Owner { get; set; }
+       
+    
 
         [Required]
         public string ConnectedUserId { get; set; }
-        [ForeignKey("ConnectedUserId")]
-        public virtual ApplicationUser ConnectedUser { get; set; }
+      
     }
 
-    public class Currency
+    public class CurrencyDTO
     {
-        [Key]
-        public int Id { get; set; }
-
+  
         [Required]
         public string Name { get; set; }
 
@@ -44,15 +35,12 @@ namespace Hostel_Management.Models.Model
 
         [Required]
         public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+     
     }
 
-    public class BankAccount
+    public class BankAccountDTO
     {
-        [Key]
-        public int Id { get; set; }
-
+     
         [Required]
         public string AccountNumber { get; set; }
 
@@ -61,40 +49,32 @@ namespace Hostel_Management.Models.Model
 
         [Required]
         public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+      
 
         [Required]
         public int CurrencyId { get; set; }
-        [ForeignKey("CurrencyId")]
-        public virtual Currency Currency { get; set; }
+
     }
 
-    public class Transaction
+    public class TransactionDTO
     {
-        [Key]
-        public int Id { get; set; }
-
+        
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         [Required]
         public int FromAccountId { get; set; }
-        [ForeignKey("FromAccountId")]
-        public virtual BankAccount FromAccount { get; set; }
+      
 
         [Required]
         public int ToAccountId { get; set; }
-        [ForeignKey("ToAccountId")]
-        public virtual BankAccount ToAccount { get; set; }
-
+  
         [Required]
         public int CurrencyId { get; set; }
-        [ForeignKey("CurrencyId")]
-        public virtual Currency Currency { get; set; }
-
+    
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
+
 
 }
