@@ -1,66 +1,89 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.Wallet>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Wallets";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 
 
-
-
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Owner)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ConnectedUser)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Owner.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ConnectedUser.Name)
-            </td>
-            <td>
-                <a class="btn btn-edit" asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a class="btn btn-edit" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a class="btn btn-delete" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<div class="fixed-bottom-buttons">
-    <div class="container">
-        <div class="row row-buttons">
-
-            <div class="col-6">
-                <div class="create-tran-btn">Add Cash</div>
-            </div>
-            <div class="col-6">
-                <div class="create-tran-btn">Send Money</div>
-            </div>
-        </div>
-    </div>
+<div class="fixed-bottom-buttons px-4 d-flex justify-content-between">
+	<h5 class="text-center" style="font-weight:bold;
+	font-size:23px;">
+		Your Books
+	</h5>
+	<p>
+		<a asp-action="Create" class="btn btn-secondary">New Wallet</a>
+	</p>
 </div>
+
+<div style="margin-top:18vh;">
+
+	
+
+	<div class="row">
+		@foreach (var item in Model)
+		{
+
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Details", new { id = item.Id })">
+                    <div class="card-body">
+                        <!-- Three-dot Dropdown Button (Top-Right) -->
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-light btn-sm" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
+                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
+                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
+                                <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="icon-container">
+                                    <i class="fa-solid fa-book"></i>
+                                </div>
+                            </div>
+                            <div class="col-10 my-2">
+                                <h5 class="card-title" style="font-weight:bold;">@item.Name</h5>
+                                <p class="card-text"><strong>Connected User:</strong> @(item.ConnectedUser?.Name ?? "N/A")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+		}
+	</div>
+
+</div>
+
+<div class="row" style="  position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;">
+	<div class="col-6 col-sm-4 col-md-3">
+		<div class="create-tran-btn">Add Cash</div>
+	</div>
+	<div class="col-6 col-sm-4 col-md-3">
+
+		<div class="create-tran-btn">Send Money</div>
+
+	</div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".card-clickable").forEach(function (card) {
+            card.addEventListener("click", function (event) {
+                // Prevent navigation when clicking on dropdown or buttons inside the card
+                if (!event.target.closest(".dropdown, button, a")) {
+                    window.location.href = card.getAttribute("data-url");
+                }
+            });
+        });
+    });
+</script>

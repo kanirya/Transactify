@@ -35,12 +35,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseAuthentication();  // ✅ **THIS IS REQUIRED**
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Wallets}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();
