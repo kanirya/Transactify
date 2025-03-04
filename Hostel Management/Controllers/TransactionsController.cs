@@ -20,7 +20,7 @@ namespace Hostel_Management.Controllers
         }
 
         // GET: Transactions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? Id)
         {
             var authDbContext = _context.Transactions.Include(t => t.Currency).Include(t => t.FromAccount).Include(t => t.ToAccount);
             return View(await authDbContext.ToListAsync());

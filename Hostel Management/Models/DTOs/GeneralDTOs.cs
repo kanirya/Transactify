@@ -28,10 +28,8 @@ namespace Hostel_Management.Models.DTOs
         public string Name { get; set; }
 
         [Required]
-        public string Symbol { get; set; }
+        public string Code { get; set; }
 
-        [Required, Column(TypeName = "decimal(18,2)")]
-        public decimal ExchangeRate { get; set; }
 
         [Required]
         public string UserId { get; set; }
@@ -47,12 +45,9 @@ namespace Hostel_Management.Models.DTOs
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal Balance { get; set; }
 
+       
         [Required]
-        public string UserId { get; set; }
-      
-
-        [Required]
-        public int CurrencyId { get; set; }
+        public string CurrencyId { get; set; }
 
     }
 

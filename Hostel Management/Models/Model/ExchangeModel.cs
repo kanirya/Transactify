@@ -28,25 +28,34 @@ namespace Hostel_Management.Models.Model
         public virtual ApplicationUser ConnectedUser { get; set; }
     }
 
-    public class Currency
-    {
+
+
+
+
+        public class Currency
+        {
+        
+     
         [Key]
-        public int Id { get; set; }
+            public int Id { get; set; }
 
-        [Required]
-        public string Name { get; set; }
+            [Required]
+            [StringLength(3, MinimumLength = 3, ErrorMessage = "Currency code must be 3 letters (ISO 4217).")]
+            public string Code { get; set; }
 
-        [Required]
-        public string Symbol { get; set; }
+            [Required]
+            [StringLength(100)]
+            public string Name { get; set; }
 
-        [Required, Column(TypeName = "decimal(18,2)")]
-        public decimal ExchangeRate { get; set; }
-
-        [Required]
-        public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+           
+           
+            [Required]
+            public string UserId { get; set; }
+            [ForeignKey("UserId")]
+            public virtual ApplicationUser User { get; set; }
+        
     }
+
 
     public class BankAccount
     {

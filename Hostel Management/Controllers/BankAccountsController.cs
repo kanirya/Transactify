@@ -7,16 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
+using Hostel_Management.Models.DTOs;
+using System.Globalization;
+using Newtonsoft.Json.Linq;
 
 namespace Hostel_Management.Controllers
 {
     public class BankAccountsController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly AuthDbContext _context;
 
-        public BankAccountsController(AuthDbContext context)
+        public BankAccountsController(AuthDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: BankAccounts
@@ -47,28 +54,51 @@ namespace Hostel_Management.Controllers
         }
 
         // GET: BankAccounts/Create
-        public IActionResult Create()
+        //api=e3099febd00359ce3a666d58
+
+        public async Task<IActionResult> Create()
         {
-            ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            //var currencies = new List<SelectListItem>();
+            //string apiKey = "e3099febd00359ce3a666d58"; // Replace with your actual API key
+            //string url = $"https://openexchangerates.org/api/currencies.json?app_id={apiKey}";
+
+            //using (HttpClient client = new HttpClient())
+            //{
+            //    var response = await client.GetStringAsync(url);
+            //    var currencyData = JObject.Parse(response);
+
+            //    foreach (var currency in currencyData)
+            //    {
+            //        currencies.Add(new SelectListItem
+            //        {
+            //            Value = currency.Key,
+            //            Text = $"{currency.Value} ({currency.Key})"
+            //        });
+            //    }
+            //}
+
+            ViewBag.CurrencyId = new SelectList(_context.Currencies,"Id","Name");
             return View();
         }
 
-        // POST: BankAccounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+            [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AccountNumber,Balance,UserId,CurrencyId")] BankAccount bankAccount)
+        public async Task<IActionResult> Create([Bind("AccountNumber,Balance,CurrencyId")] BankAccountDTO bankAcc)
         {
+            var bankAccount = new BankAccount();
+            var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
+                bankAccount.AccountNumber = bankAcc.AccountNumber;
+                bankAccount.Balance = bankAcc.Balance;
+                bankAccount.UserId = user.Id;
+
                 _context.Add(bankAccount);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name", bankAccount.CurrencyId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", bankAccount.UserId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Code", bankAccount.UserId);
             return View(bankAccount);
         }
 

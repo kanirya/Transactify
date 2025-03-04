@@ -27,6 +27,7 @@ namespace Hostel_Management.Controllers
         public async Task<IActionResult> Index()
         {
             var user =await _userManager.GetUserAsync(User);
+            ViewBag.Wallet = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w => w.ConnectedUser.Id == user.Id);
             var authDbContext = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w=>w.OwnerId==user.Id);
             return View(await authDbContext.ToListAsync());
         }

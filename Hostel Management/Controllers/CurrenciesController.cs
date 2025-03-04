@@ -8,24 +8,29 @@ using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
 using Hostel_Management.Models.DTOs;
+using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
 
 namespace Hostel_Management.Controllers
 {
     public class CurrenciesController : Controller
     {
         private readonly AuthDbContext _context;
-
-        public CurrenciesController(AuthDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CurrenciesController(AuthDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Currencies
         public async Task<IActionResult> Index()
         {
-            var authDbContext = _context.Currencies.Include(c => c.User);
-            return View(await authDbContext.ToListAsync());
+            var currencies = await _context.Currencies.ToListAsync();
+            return View(currencies);
         }
+
 
         // GET: Currencies/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -47,86 +52,72 @@ namespace Hostel_Management.Controllers
         }
 
         // GET: Currencies/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            var currencies = new List<SelectListItem>();
+            string apiKey = "e3099febd00359ce3a666d58"; // Replace with your actual API key
+            string url = $"https://openexchangerates.org/api/currencies.json?app_id={apiKey}";
+
+            using (HttpClient client = new HttpClient())
+            {
+                var response = await client.GetStringAsync(url);
+                var currencyData = JObject.Parse(response);
+
+                foreach (var currency in currencyData)
+                {
+                    currencies.Add(new SelectListItem
+                    {
+                        Value = currency.Key,
+                        Text = $"{currency.Value} ({currency.Key})"
+                    });
+                }
+            }
+
+            ViewBag.CurrencyList = currencies.OrderBy(c => c.Text).ToList();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CurrencyDTO cur)
+        public async Task<IActionResult> Create(string selectedCurrencyCode)
         {
-            Currency currency = new Currency();
-
-            if (ModelState.IsValid)
+            if (string.IsNullOrEmpty(selectedCurrencyCode))
             {
-               
-                currency.UserId = cur.UserId;
-                currency.Name = cur.Name;
-                currency.ExchangeRate = cur.ExchangeRate;
-                currency.Symbol= cur.Symbol;
-
-                _context.Add(currency);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
-        }
-
-        // GET: Currencies/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                ModelState.AddModelError("", "Please select a currency.");
+                return View();
             }
 
-            var currency = await _context.Currencies.FindAsync(id);
-            if (currency == null)
-            {
-                return NotFound();
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
-        }
+            // Fetch currency name again from API (if needed)
+            string apiKey = "e3099febd00359ce3a666d58";
+            string url = $"https://openexchangerates.org/api/currencies.json?app_id={apiKey}";
+            string currencyName = selectedCurrencyCode;
 
-        // POST: Currencies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Symbol,ExchangeRate,UserId")] Currency currency)
-        {
-            if (id != currency.Id)
+            using (HttpClient client = new HttpClient())
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                var response = await client.GetStringAsync(url);
+                var currencyData = JObject.Parse(response);
+                if (currencyData.ContainsKey(selectedCurrencyCode))
                 {
-                    _context.Update(currency);
-                    await _context.SaveChangesAsync();
+                    currencyName = currencyData[selectedCurrencyCode].ToString();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CurrencyExists(currency.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", currency.UserId);
-            return View(currency);
+            var user = await _userManager.GetUserAsync(User);
+            var newCurrency = new Currency
+            {
+                Code = selectedCurrencyCode,
+                Name = currencyName,
+                UserId = user.Id
+            };
+
+            _context.Currencies.Add(newCurrency);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index"); // Redirect after saving
         }
+    
+
+
+   
 
         // GET: Currencies/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -26,7 +26,7 @@
 		{
 
             <div class="col-lg-6 col-xl-4 mb-4">
-                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Details", new { id = item.Id })">
+                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Index","Transactions", new { id = item.Id })"style="cursor:pointer;" >
                     <div class="card-body">
                         <!-- Three-dot Dropdown Button (Top-Right) -->
                         <div class="dropdown position-absolute top-0 end-0 m-2">
@@ -56,6 +56,44 @@
 
 
 		}
+
+
+        <hr />
+        @foreach (var item in ViewBag.Wallet)
+        {
+
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Details", new { id = item.Id })" style="cursor:pointer;">
+                    <div class="card-body">
+                        <!-- Three-dot Dropdown Button (Top-Right) -->
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-light btn-sm" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
+                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
+                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
+                                <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="icon-container">
+                                    <i class="fa-solid fa-book"></i>
+                                </div>
+                            </div>
+                            <div class="col-10 my-2">
+                                <h5 class="card-title" style="font-weight:bold;">@item.Name</h5>
+                                <p class="card-text"><strong>Connected User:</strong> @(item.ConnectedUser?.Name ?? "N/A")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+
 	</div>
 
 </div>
