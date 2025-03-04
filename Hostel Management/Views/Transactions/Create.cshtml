@@ -11,8 +11,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+        <h4>@ViewBag.WalledId</h4>
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="WalletId" value="@ViewBag.WalletId" />
             <div class="form-group">
                 <label asp-for="Amount" class="control-label"></label>
                 <input asp-for="Amount" class="form-control" />

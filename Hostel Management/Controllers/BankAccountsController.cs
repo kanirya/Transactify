@@ -58,40 +58,27 @@ namespace Hostel_Management.Controllers
 
         public async Task<IActionResult> Create()
         {
-            //var currencies = new List<SelectListItem>();
-            //string apiKey = "e3099febd00359ce3a666d58"; // Replace with your actual API key
-            //string url = $"https://openexchangerates.org/api/currencies.json?app_id={apiKey}";
 
-            //using (HttpClient client = new HttpClient())
-            //{
-            //    var response = await client.GetStringAsync(url);
-            //    var currencyData = JObject.Parse(response);
-
-            //    foreach (var currency in currencyData)
-            //    {
-            //        currencies.Add(new SelectListItem
-            //        {
-            //            Value = currency.Key,
-            //            Text = $"{currency.Value} ({currency.Key})"
-            //        });
-            //    }
-            //}
-
-            ViewBag.CurrencyId = new SelectList(_context.Currencies,"Id","Name");
+            var user =await _userManager.GetUserAsync(User);
+            ViewBag.CurrencyId = new SelectList(_context.Currencies.Where(u=>u.UserId==user.Id),"Id","Name");
             return View();
         }
 
             [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AccountNumber,Balance,CurrencyId")] BankAccountDTO bankAcc)
+        public async Task<IActionResult> Create([Bind("AccountName,AccountNumber,Balance,CurrencyId")] BankAccountDTO bankAcc)
         {
             var bankAccount = new BankAccount();
             var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
+
+                bankAccount.AccountName = bankAcc.AccountName;
                 bankAccount.AccountNumber = bankAcc.AccountNumber;
                 bankAccount.Balance = bankAcc.Balance;
                 bankAccount.UserId = user.Id;
+
+                bankAccount.CurrencyId =int.Parse( bankAcc.CurrencyId);
 
                 _context.Add(bankAccount);
                 await _context.SaveChangesAsync();

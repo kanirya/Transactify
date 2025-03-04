@@ -58,12 +58,13 @@
 		}
 
 
+        
         <hr />
         @foreach (var item in ViewBag.Wallet)
         {
 
             <div class="col-lg-6 col-xl-4 mb-4">
-                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Details", new { id = item.Id })" style="cursor:pointer;">
+                <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Index","Transactions", new { id = item.Id })" style="cursor:pointer;">
                     <div class="card-body">
                         <!-- Three-dot Dropdown Button (Top-Right) -->
                         <div class="dropdown position-absolute top-0 end-0 m-2">
@@ -79,7 +80,7 @@
                         <div class="row">
                             <div class="col-2">
                                 <div class="icon-container">
-                                    <i class="fa-solid fa-book"></i>
+                                    <i class="fa-solid fa-book" style="color:rebeccapurple"></i>
                                 </div>
                             </div>
                             <div class="col-10 my-2">

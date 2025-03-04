@@ -40,6 +40,8 @@ namespace Hostel_Management.Models.DTOs
     {
      
         [Required]
+        public string AccountName { get; set; }
+        [Required]
         public string AccountNumber { get; set; }
 
         [Required, Column(TypeName = "decimal(18,2)")]
@@ -49,10 +51,15 @@ namespace Hostel_Management.Models.DTOs
         [Required]
         public string CurrencyId { get; set; }
 
+
+
+
     }
 
     public class TransactionDTO
     {
+        [Required]
+        public int WalletId { get; set; }
         
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }

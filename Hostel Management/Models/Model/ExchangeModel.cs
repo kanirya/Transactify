@@ -61,7 +61,8 @@ namespace Hostel_Management.Models.Model
     {
         [Key]
         public int Id { get; set; }
-
+        [Required]
+        public string AccountName { set; get; }
         [Required]
         public string AccountNumber { get; set; }
 
@@ -77,13 +78,17 @@ namespace Hostel_Management.Models.Model
         public int CurrencyId { get; set; }
         [ForeignKey("CurrencyId")]
         public virtual Currency Currency { get; set; }
+        public string AccountDisplay => $"{AccountName} ({AccountNumber})";
     }
 
     public class Transaction
     {
         [Key]
         public int Id { get; set; }
+        [Required]
+        public int WalletId { get; set; }  // Ensure this is NOT nullable
 
+        public virtual Wallet Wallet { get; set; }
         [Required, Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 

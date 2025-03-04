@@ -4,6 +4,7 @@ using Hostel_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hostel_Management.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304051931_Adding name in account model")]
+    partial class Addingnameinaccountmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,9 +182,6 @@ namespace Hostel_Management.Migrations
                     b.Property<int>("ToAccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WalletId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
@@ -189,8 +189,6 @@ namespace Hostel_Management.Migrations
                     b.HasIndex("FromAccountId");
 
                     b.HasIndex("ToAccountId");
-
-                    b.HasIndex("WalletId");
 
                     b.ToTable("Transactions");
                 });
@@ -411,19 +409,11 @@ namespace Hostel_Management.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Hostel_Management.Models.Model.Wallet", "Wallet")
-                        .WithMany()
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Currency");
 
                     b.Navigation("FromAccount");
 
                     b.Navigation("ToAccount");
-
-                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("Hostel_Management.Models.Model.Wallet", b =>

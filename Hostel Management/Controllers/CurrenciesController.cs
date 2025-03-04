@@ -27,7 +27,8 @@ namespace Hostel_Management.Controllers
         // GET: Currencies
         public async Task<IActionResult> Index()
         {
-            var currencies = await _context.Currencies.ToListAsync();
+            var user = await _userManager.GetUserAsync(User);
+            var currencies = await _context.Currencies.Where(u=>u.UserId==user.Id).ToListAsync();
             return View(currencies);
         }
 
