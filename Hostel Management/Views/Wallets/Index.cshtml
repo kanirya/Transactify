@@ -53,16 +53,10 @@
                     </div>
                 </div>
             </div>
-
-
-		}
-
-
-        
+		}       
         <hr />
         @foreach (var item in ViewBag.Wallet)
         {
-
             <div class="col-lg-6 col-xl-4 mb-4">
                 <div class="card shadow-sm border-0 rounded-3 position-relative card-clickable" data-url="@Url.Action("Index","Transactions", new { id = item.Id })" style="cursor:pointer;">
                     <div class="card-body">
@@ -77,6 +71,7 @@
                                 <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
                             </ul>
                         </div>
+
                         <div class="row">
                             <div class="col-2">
                                 <div class="icon-container">

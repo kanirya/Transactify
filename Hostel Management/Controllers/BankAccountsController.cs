@@ -29,7 +29,8 @@ namespace Hostel_Management.Controllers
         // GET: BankAccounts
         public async Task<IActionResult> Index()
         {
-            var authDbContext = _context.BankAccounts.Include(b => b.Currency).Include(b => b.User);
+            var user = await _userManager.GetUserAsync(User);
+            var authDbContext = _context.BankAccounts.Include(b => b.Currency).Include(b => b.User).Where(u=>u.UserId==user.Id);
             return View(await authDbContext.ToListAsync());
         }
 

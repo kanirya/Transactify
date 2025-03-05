@@ -48,9 +48,10 @@ namespace Hostel_Management.Controllers
         public IActionResult Create(int id)
         {
             ViewBag.WalletId = id;
+            var opposite_user = _context.Wallets.Find(id);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name");
             ViewData["FromAccountId"] = new SelectList(_context.BankAccounts, "Id", "AccountDisplay");
-            ViewData["ToAccountId"] = new SelectList(_context.BankAccounts, "Id", "AccountDisplay");
+            ViewData["ToAccountId"] = new SelectList(_context.BankAccounts.Where(u=>u.UserId==opposite_user.ConnectedUserId), "Id", "AccountDisplay");
             return View();
         }
 
@@ -61,7 +62,8 @@ namespace Hostel_Management.Controllers
             if (!ModelState.IsValid)
                 return View(tran);
 
-
+            var opposite_Account = _context.BankAccounts.Find(tran.ToAccountId);
+            opposite_Account.Balance += tran.Amount;
             var transaction = new Transaction
             {
                 WalletId = tran.WalletId,
@@ -71,7 +73,7 @@ namespace Hostel_Management.Controllers
                 ToAccountId = tran.ToAccountId,
                 Timestamp = DateTime.UtcNow
             };
-
+            _context.Update(opposite_Account);
             _context.Add(transaction);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new { Id = transaction.WalletId });
