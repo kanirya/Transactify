@@ -7,7 +7,7 @@
 
 
 
-<div class="fixed-bottom-buttons px-4 d-flex justify-content-between">
+<div class="fixed-bottom-buttons px-4 d-flex justify-content-between" style="z-index:1040;">
 	<h5 class="text-center" style="font-weight:bold;
 	font-size:23px;">
 		Your Books
@@ -17,10 +17,10 @@
 	</p>
 </div>
 
-<div style="margin-top:18vh;">
+<div style="margin-top:18vh;margin-bottom:10vh;">
 
 	
-
+    <h5 style="font-weight:bold;">My Books></h5>
 	<div class="row">
 		@foreach (var item in Model)
 		{
@@ -40,14 +40,14 @@
                             </ul>
                         </div>
                         <div class="row">
-                            <div class="col-2">
+                            <div class="col-3 col-sm-2">
                                 <div class="icon-container">
                                     <i class="fa-solid fa-book"></i>
                                 </div>
                             </div>
-                            <div class="col-10 my-2">
+                            <div class="col-9 col-sm-10 my-2">
                                 <h5 class="card-title" style="font-weight:bold;">@item.Name</h5>
-                                <p class="card-text"><strong>Connected User:</strong> @(item.ConnectedUser?.Name ?? "N/A")</p>
+                                <p class="card-text"><strong>Connected :</strong> @(item.ConnectedUser?.Name ?? "N/A")</p>
                             </div>
                         </div>
                     </div>
@@ -55,6 +55,7 @@
             </div>
 		}       
         <hr />
+        <h5 style="font-weight:bold;">Collaborative Books ></h5>
         @foreach (var item in ViewBag.Wallet)
         {
             <div class="col-lg-6 col-xl-4 mb-4">
@@ -73,12 +74,12 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-2">
+                            <div class="col-3 col-sm-2">
                                 <div class="icon-container">
                                     <i class="fa-solid fa-book" style="color:rebeccapurple"></i>
                                 </div>
                             </div>
-                            <div class="col-10 my-2">
+                            <div class="col-9 col-sm-10 my-2">
                                 <h5 class="card-title" style="font-weight:bold;">@item.Name</h5>
                                 <p class="card-text"><strong>Connected User:</strong> @(item.ConnectedUser?.Name ?? "N/A")</p>
                             </div>

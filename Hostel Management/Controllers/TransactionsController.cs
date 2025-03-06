@@ -131,7 +131,6 @@ namespace Hostel_Management.Controllers
 
             return transaction == null ? NotFound() : View(transaction);
         }
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -140,9 +139,12 @@ namespace Hostel_Management.Controllers
             if (transaction == null)
                 return NotFound();
 
+            int walletId = transaction.WalletId; // Get the WalletId before deletion
+
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Index), new { Id = walletId }); // Redirect to the correct wallet
         }
 
         private bool TransactionExists(int id)

@@ -14,14 +14,22 @@
     <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="appbar d-flex align-items-center " style="height: 45px;  color: white;">
-        <button class="toggle-btn btn btn-close text-black me-3" onclick="toggleSidebar()" style="border: none; ">
-            <i class="fa-solid fa-bars"></i>
+    <div class="appbar d-flex align-items-center px-3" style="height: 45px; color: white;">
+        <!-- Left Section: Toggle Button -->
+        <button class="toggle-btn btn btn-close text-white me-2" onclick="toggleSidebar()" style="border: none; background: transparent;">
+            <i style="text-decoration:none;" class="fa-solid fa-bars"></i>
         </button>
-        <h5 class="p-2">Hostel Management</h5>
-        <partial name="_LoginPartial.cshtml" />
 
+        <!-- Title: Positioned right after the button -->
+        <h5 style="font-weight:bold;font-size:17px;" class="px-4">Transaction Portal</h5>
+
+        <!-- Right Section: Pushes _LoginPartial.cshtml to the right -->
+        <div class="ms-auto">
+            <partial name="_LoginPartial.cshtml" />
+        </div>
     </div>
+
+
     
 <div class="main-container d-flex">
         <div class="sidebar  " id="side_nav">
@@ -37,7 +45,7 @@
             </ul>
         </div>
 </div>
-    <div class="container" style="margin-top:50px;height:100%;";>
+    <div class="" style="margin-top:50px;height:100%;";>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
