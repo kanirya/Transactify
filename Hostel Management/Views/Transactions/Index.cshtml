@@ -1,48 +1,85 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.Transaction>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transactions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="">
-    <div class="row justify-content-center">
+
+<div class="container py-4">
+    <!-- Transaction Summary Card -->
+    <div class="transaction-summary-container p-4 shadow rounded-4 bg-white position-relative" style="max-width: 400px; min-height: 22vh; border-left: 6px solid #007bff;">
+        <h4 class="text-dark fw-bold text-center mb-3" style="font-size: 18px;">
+            <i class="fas fa-chart-line text-primary"></i> Transaction Overview
+        </h4>
+        <div class="d-flex flex-column gap-2">
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-coins text-success"></i> <strong>Total Amount:</strong>
+                <span class="text-dark fw-bold">@ViewBag.TotalAmount PKR</span>
+            </p>
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-file-invoice text-warning"></i> <strong>Transactions:</strong>
+                <span class="text-dark fw-bold">@ViewBag.TransactionsCount</span>
+            </p>
+            <hr class="my-2 text-muted" />
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-user-circle text-primary"></i> <strong>Primary Account Holder:</strong>
+                <span class="text-dark fw-bold">@ViewBag.ThisUser.Owner.Name</span>
+            </p>
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-user-check text-info"></i> <strong>Authorized Delegate:</strong>
+                <span class="text-dark fw-bold">@ViewBag.ThisUser.ConnectedUser.Name</span>
+            </p>
+        </div>
+    </div>
+
+    <hr />
+    <h5 class="fw-bold text-dark">Transactions</h5>
+    <div class="row g-3">
         @foreach (var item in Model)
         {
-            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 d-flex justify-content-center p-2">
-                <div class="position-relative" style="width: 100%; max-width: 350px;">
+            <div class="col-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4 d-flex justify-content-center p-2">
+                <div class="position-relative" style="width: 100%; max-width: 450px;">
                     <!-- Dropdown Positioned Absolutely in the Card -->
                     <div class="justify-content-between d-flex px-3">
 
 
-                    <h5 class="" style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">
-                        @item.Timestamp.ToString("dd MMMMM yyyy")
-                    </h5>
-                    <div class="dropdown">
-                        <button class="btn btn-light btn-sm" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-ellipsis-vertical" style="color:black;"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
-                            <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
-                            <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
-                            <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
-                        </ul>
-                    </div>
+                        <h5 class="" style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">
+                            @item.Timestamp.ToString("dd MMMMM yyyy")
+                        </h5>
+                       
                     </div>
                     <div class="transaction-container p-3">
+                     
+                  
                         <div class="d-flex justify-content-between">
                             <h5 style="font-size:14px;"><strong>@item.Currency.Code</strong> @item.Amount</h5>
-                            <h5 style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">@item.Timestamp.ToString("h:mm tt")</h5>
+
+
+                            <div class="d-flex">
+                                <h5 class="px-2" style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">@item.Timestamp.ToString("h:mm tt")</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm border-0" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
+                                        <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
+                                        <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                                    </ul>
+                                </div>
+                                </div>
+                           
                         </div>
                         <hr />
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h5 style="font-size:14px;font-weight:300;">@item.FromAccount.AccountName</h5>
-                                <h5 style="font-size:14px;font-weight:300;">@item.FromAccount.AccountNumber</h5>
+                                <p class="mb-0 text-secondary">From: <span class="fw-bold">@item.FromAccount.AccountName</span></p>
+                                <p class="mb-0 text-secondary" style="font-size: 14px;">@item.FromAccount.AccountNumber</p>
                             </div>
                             <i class="fa-solid fa-arrow-right moving-arrow fa-2x"></i>
-                            <div>
-                                <h5 style="font-size:14px;font-weight:300;">@item.ToAccount.AccountName</h5>
-                                <h5 style="font-size:14px;font-weight:300;">@item.ToAccount.AccountNumber</h5>
+                            <div class="px-2">
+                                <p class="mb-0 text-secondary">To: <span class="fw-bold">@item.ToAccount.AccountName</span></p>
+                                <p class="mb-0 text-secondary" style="font-size: 14px;">@item.ToAccount.AccountNumber</p>
                             </div>
                         </div>
                     </div>
@@ -52,27 +89,19 @@
     </div>
 </div>
 
-
-
-<p>
-    <a asp-action="Create" asp-route-id="@ViewBag.id">Create New</a>
-</p>
 <div class="row" style="  position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     padding: 10px;">
-	<div class="col-6 col-sm-4 col-md-3">
+    <div class="col-6 col-sm-4 col-md-3">
         <a style="text-decoration:none;" asp-action="Create" asp-route-id="@ViewBag.id">
             <div class="create-tran-btn">Add Cash</div>
         </a>
-	</div>
-	<div class="col-6 col-sm-4 col-md-3">
-
+    </div>
+    <div class="col-6 col-sm-4 col-md-3">
         <a style="text-decoration:none;" asp-action="Create" asp-route-id="@ViewBag.id">
             <div class="create-tran-btn">Send Money</div>
-
         </a>
-
-	</div>
+    </div>
 </div>

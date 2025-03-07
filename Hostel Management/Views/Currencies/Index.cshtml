@@ -1,48 +1,48 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.Currency>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Currencies";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <h4 class="fw-bold text-dark text-center mb-3">
+        <i class="fas fa-coins text-warning"></i> Available Currencies
+    </h4>
+    <div class="row g-3">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="card shadow-lg border-0 rounded-3 bg-light">
+                    <div class="card-body p-3 text-center">
+                        <h5 class="fw-bold text-dark">
+                            <i class="fas fa-money-bill text-success"></i> @item.Code
+                        </h5>
+                        <p class="text-muted" style="font-size: 14px;">
+                            <i class="fas fa-file-invoice text-primary"></i> @item.Name
+                        </p>
+                        <hr />
+                        <div class="d-flex justify-content-center gap-2">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Fixed Bottom Button -->
+<div class="fixed-bottom py-3 bg-dark text-white shadow-lg d-flex justify-content-center">
+    <a asp-action="Create" class="btn btn-success rounded-pill px-4 py-2">
+        <i class="fas fa-plus-circle"></i> Add Currency
+    </a>
+</div>

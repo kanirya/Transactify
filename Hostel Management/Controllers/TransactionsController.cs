@@ -22,12 +22,19 @@ namespace Hostel_Management.Controllers
 
         public async Task<IActionResult> Index(int? Id)
         {
+
             ViewBag.id = Id;
             var transactions = _context.Transactions
                 .Where(t => Id == null || t.WalletId == Id)
                 .Include(t => t.Currency)
                 .Include(t => t.FromAccount)
                 .Include(t => t.ToAccount);
+            ViewBag.TotalAmount = await transactions.Where(t => t.WalletId == Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
+            ViewBag.TransactionsCount = await transactions.Where(t => t.WalletId == Id).CountAsync();
+            ViewBag.ThisUser = await _context.Wallets
+        .Include(w => w.Owner)           // Load Owner
+              .Include(w => w.ConnectedUser)   // Load Connected User
+             .FirstOrDefaultAsync(w => w.Id == Id);
             return View(await transactions.ToListAsync());
         }
 
@@ -51,7 +58,7 @@ namespace Hostel_Management.Controllers
             var opposite_user = _context.Wallets.Find(id);
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name");
             ViewData["FromAccountId"] = new SelectList(_context.BankAccounts, "Id", "AccountDisplay");
-            ViewData["ToAccountId"] = new SelectList(_context.BankAccounts.Where(u=>u.UserId==opposite_user.ConnectedUserId), "Id", "AccountDisplay");
+            ViewData["ToAccountId"] = new SelectList(_context.BankAccounts.Where(u => u.UserId == opposite_user.ConnectedUserId), "Id", "AccountDisplay");
             return View();
         }
 

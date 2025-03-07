@@ -15,15 +15,11 @@
 </head>
 <body>
     <div class="appbar d-flex align-items-center px-3" style="height: 45px; color: white;">
-        <!-- Left Section: Toggle Button -->
         <button class="toggle-btn btn btn-close text-white me-2" onclick="toggleSidebar()" style="border: none; background: transparent;">
             <i style="text-decoration:none;" class="fa-solid fa-bars"></i>
         </button>
 
-        <!-- Title: Positioned right after the button -->
         <h5 style="font-weight:bold;font-size:17px;" class="px-4">Transaction Portal</h5>
-
-        <!-- Right Section: Pushes _LoginPartial.cshtml to the right -->
         <div class="ms-auto">
             <partial name="_LoginPartial.cshtml" />
         </div>
