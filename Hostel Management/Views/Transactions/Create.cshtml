@@ -1,48 +1,100 @@
 ﻿@model Hostel_Management.Models.Model.Transaction
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Transaction";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4">
+                <h4 class="mb-3 fw-semibold text-center">Create Transaction</h4>
 
-<h4>Transaction</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <h4>@ViewBag.WalledId</h4>
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" name="WalletId" value="@ViewBag.WalletId" />
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
+                <form asp-action="Create">
+                    <input type="hidden" name="WalletId" value="@ViewBag.WalletId" />
+
+                    <div class="mb-3">
+                        <label asp-for="Amount" class="form-label fw-medium">Amount</label>
+                        <input asp-for="Amount" class="form-control custom-input" placeholder="Enter amount" />
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FromAccountId" class="form-label fw-medium">From Account</label>
+                        <select asp-for="FromAccountId" class="form-select custom-input" asp-items="ViewBag.FromAccountId">
+                            <option value="" selected disabled>Select an account</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ToAccountId" class="form-label fw-medium">To Account</label>
+                        <select asp-for="ToAccountId" class="form-select custom-input" asp-items="ViewBag.ToAccountId">
+                            <option value="" selected disabled>Select an account</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CurrencyId" class="form-label fw-medium">Currency</label>
+                        <select asp-for="CurrencyId" class="form-select custom-input" asp-items="ViewBag.CurrencyId">
+                            <option value="" selected disabled>Select currency</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark btn-lg">Create Transaction</button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="FromAccountId" class="control-label"></label>
-                <select asp-for="FromAccountId" class ="form-control" asp-items="ViewBag.FromAccountId"></select>
+
+            <div class="text-center mt-3">
+                <a asp-action="Index" asp-route-id="@ViewBag.WalletId" class="text-muted">← Back to List</a>
             </div>
-            <div class="form-group">
-                <label asp-for="ToAccountId" class="control-label"></label>
-                <select asp-for="ToAccountId" class ="form-control" asp-items="ViewBag.ToAccountId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="CurrencyId" class="control-label"></label>
-                <select asp-for="CurrencyId" class ="form-control" asp-items="ViewBag.CurrencyId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    /* Professional Input Styling */
+    .custom-input {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 14px;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .custom-input:focus {
+            border-color: #6c757d;
+            box-shadow: none;
+        }
+
+    /* Card Styling */
+    .card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Button Styling */
+    .btn-dark {
+        background-color: #343a40;
+        border: none;
+    }
+
+        .btn-dark:hover {
+            background-color: #23272b;
+        }
+
+    /* Text Styling */
+    .fw-semibold {
+        font-weight: 600;
+    }
+
+</style>

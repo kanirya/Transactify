@@ -10,9 +10,11 @@ using Hostel_Management.Models.Model;
 using Hostel_Management.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Hostel_Management.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hostel_Management.Controllers
 {
+    [Authorize]
     public class WalletsController : Controller
     {
         private readonly AuthDbContext _context;
@@ -26,6 +28,12 @@ namespace Hostel_Management.Controllers
         // GET: Wallets
         public async Task<IActionResult> Index()
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account"); // Redirect to login or show an error page
+            }
+
             var user =await _userManager.GetUserAsync(User);
             ViewBag.Wallet = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w => w.ConnectedUser.Id == user.Id);
             var authDbContext = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w=>w.OwnerId==user.Id);

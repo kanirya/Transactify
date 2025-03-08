@@ -8,16 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
 using Hostel_Management.Models.DTOs;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
 
 namespace Hostel_Management.Controllers
 {
     public class TransactionsController : Controller
     {
         private readonly AuthDbContext _context;
-
-        public TransactionsController(AuthDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public TransactionsController(AuthDbContext context,UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index(int? Id)
@@ -52,15 +55,27 @@ namespace Hostel_Management.Controllers
             return transaction == null ? NotFound() : View(transaction);
         }
 
-        public IActionResult Create(int id)
+        public async Task<IActionResult> Create(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized(); // Handle unauthenticated user
+
             ViewBag.WalletId = id;
-            var opposite_user = _context.Wallets.Find(id);
+
+            var opposite_user = await _context.Wallets.FindAsync(id);
+            if (opposite_user == null) return NotFound(); // Handle invalid wallet ID
+
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Name");
-            ViewData["FromAccountId"] = new SelectList(_context.BankAccounts, "Id", "AccountDisplay");
-            ViewData["ToAccountId"] = new SelectList(_context.BankAccounts.Where(u => u.UserId == opposite_user.ConnectedUserId), "Id", "AccountDisplay");
+            ViewData["FromAccountId"] = new SelectList(
+                _context.BankAccounts.Where(u => u.UserId == user.Id), "Id", "AccountDisplay"
+            );
+            ViewData["ToAccountId"] = new SelectList(
+                _context.BankAccounts.Where(u => u.UserId == opposite_user.ConnectedUserId), "Id", "AccountDisplay"
+            );
+
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -71,6 +86,8 @@ namespace Hostel_Management.Controllers
 
             var opposite_Account = _context.BankAccounts.Find(tran.ToAccountId);
             opposite_Account.Balance += tran.Amount;
+            var Owner_Account = _context.BankAccounts.Find(tran.FromAccountId);
+            Owner_Account.Balance -= tran.Amount;
             var transaction = new Transaction
             {
                 WalletId = tran.WalletId,
@@ -81,6 +98,8 @@ namespace Hostel_Management.Controllers
                 Timestamp = DateTime.UtcNow
             };
             _context.Update(opposite_Account);
+            _context.Update(Owner_Account);
+
             _context.Add(transaction);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new { Id = transaction.WalletId });
