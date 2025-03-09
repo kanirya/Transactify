@@ -34,9 +34,10 @@ namespace Hostel_Management.Controllers
                 return RedirectToAction("Login", "Account"); // Redirect to login or show an error page
             }
 
-            var user =await _userManager.GetUserAsync(User);
-            ViewBag.Wallet = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w => w.ConnectedUser.Id == user.Id);
-            var authDbContext = _context.Wallets.Include(w => w.ConnectedUser).Include(w => w.Owner).Where(w=>w.OwnerId==user.Id);
+            ViewBag.Wallet = _context.Wallets.Include(w => w.ConnectedUser)
+                .Include(w => w.Owner).Where(w => w.ConnectedUser.Id == user.Id);
+            var authDbContext = _context.Wallets.Include(w => w.ConnectedUser)
+                .Include(w => w.Owner).Where(w=>w.OwnerId==user.Id);
             return View(await authDbContext.ToListAsync());
         }
 

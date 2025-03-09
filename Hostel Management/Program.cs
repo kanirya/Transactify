@@ -9,18 +9,27 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TransactionPortal")
     ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
 
-// Configure authentication
-builder.Services.AddAuthentication().AddCookie();
+// Configure DbContext
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(
-    options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<AuthDbContext>();
+// Configure Identity
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<AuthDbContext>();
+
+// Configure Application Cookie to ensure correct login redirection
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.Configure<IdentityOptions>(options => options.Password.RequireUppercase = false);
 
 var app = builder.Build();
 
@@ -35,7 +44,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseAuthentication(); 
+app.UseAuthentication(); // Ensure Authentication is before Authorization
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hostel_Management.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250301101254_Add Name in Wallet")]
-    partial class AddNameinWallet
+    [Migration("20250309085423_Initial Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,6 +102,10 @@ namespace Hostel_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AccountNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -133,16 +137,15 @@ namespace Hostel_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ExchangeRate")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -179,6 +182,13 @@ namespace Hostel_Management.Migrations
                     b.Property<int>("ToAccountId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WalletId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
@@ -186,6 +196,10 @@ namespace Hostel_Management.Migrations
                     b.HasIndex("FromAccountId");
 
                     b.HasIndex("ToAccountId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("Transactions");
                 });
@@ -367,7 +381,7 @@ namespace Hostel_Management.Migrations
                     b.HasOne("Hostel_Management.Areas.Identity.Data.ApplicationUser", "User")
                         .WithMany("BankAccounts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Currency");
@@ -380,7 +394,7 @@ namespace Hostel_Management.Migrations
                     b.HasOne("Hostel_Management.Areas.Identity.Data.ApplicationUser", "User")
                         .WithMany("Currencies")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -391,7 +405,7 @@ namespace Hostel_Management.Migrations
                     b.HasOne("Hostel_Management.Models.Model.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Hostel_Management.Models.Model.BankAccount", "FromAccount")
@@ -406,11 +420,27 @@ namespace Hostel_Management.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Hostel_Management.Areas.Identity.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Hostel_Management.Models.Model.Wallet", "Wallet")
+                        .WithMany()
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Currency");
 
                     b.Navigation("FromAccount");
 
                     b.Navigation("ToAccount");
+
+                    b.Navigation("User");
+
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("Hostel_Management.Models.Model.Wallet", b =>

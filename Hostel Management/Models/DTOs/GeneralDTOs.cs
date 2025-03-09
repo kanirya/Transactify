@@ -73,7 +73,8 @@ namespace Hostel_Management.Models.DTOs
   
         [Required]
         public int CurrencyId { get; set; }
-    
+
+
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }

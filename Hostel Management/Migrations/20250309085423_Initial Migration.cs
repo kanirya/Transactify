@@ -163,9 +163,8 @@ namespace Hostel_Management.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExchangeRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -176,7 +175,7 @@ namespace Hostel_Management.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -185,6 +184,7 @@ namespace Hostel_Management.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ConnectedUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -211,6 +211,7 @@ namespace Hostel_Management.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -224,7 +225,7 @@ namespace Hostel_Management.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_BankAccounts_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
@@ -239,15 +240,23 @@ namespace Hostel_Management.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    WalletId = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     FromAccountId = table.Column<int>(type: "int", nullable: false),
                     ToAccountId = table.Column<int>(type: "int", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transactions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Transactions_BankAccounts_FromAccountId",
                         column: x => x.FromAccountId,
@@ -265,7 +274,13 @@ namespace Hostel_Management.Migrations
                         column: x => x.CurrencyId,
                         principalTable: "Currencies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -338,6 +353,16 @@ namespace Hostel_Management.Migrations
                 column: "ToAccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transactions_UserId",
+                table: "Transactions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_WalletId",
+                table: "Transactions",
+                column: "WalletId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Wallets_ConnectedUserId",
                 table: "Wallets",
                 column: "ConnectedUserId");
@@ -370,13 +395,13 @@ namespace Hostel_Management.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "BankAccounts");
+
+            migrationBuilder.DropTable(
+                name: "Wallets");
 
             migrationBuilder.DropTable(
                 name: "Currencies");

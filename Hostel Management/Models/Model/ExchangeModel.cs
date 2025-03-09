@@ -107,6 +107,12 @@ namespace Hostel_Management.Models.Model
         [ForeignKey("CurrencyId")]
         public virtual Currency Currency { get; set; }
 
+
+        [Required]
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
+
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }

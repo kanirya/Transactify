@@ -17,6 +17,14 @@
                 <span class="text-dark fw-bold">@ViewBag.TotalAmount PKR</span>
             </p>
             <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-coins text-success"></i> <strong>Send Amount:</strong>
+                <span class="text-dark fw-bold">@ViewBag.SendAmount PKR</span>
+            </p>
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
+                <i class="fas fa-coins text-success"></i> <strong>Receive Amount:</strong>
+                <span class="text-dark fw-bold">@ViewBag.ReceiveAmount PKR</span>
+            </p>
+            <p class="mb-0 text-secondary" style="font-size: 15px;">
                 <i class="fas fa-file-invoice text-warning"></i> <strong>Transactions:</strong>
                 <span class="text-dark fw-bold">@ViewBag.TransactionsCount</span>
             </p>
@@ -49,10 +57,21 @@
                        
                     </div>
                     <div class="transaction-container p-3">
-                     
-                  
+
+
                         <div class="d-flex justify-content-between">
-                            <h5 style="font-size:14px;"><strong>@item.Currency.Code</strong> @item.Amount</h5>
+                            <h5 style="font-size:14px;">
+                                <strong>@item.Currency.Code</strong>
+                                @if (item.User.Id == ViewBag.CurrentUserId)
+                                {
+                                    @("-" + item.Amount) <!-- Show as negative if UserId matches -->
+                                }
+                                else
+                                {
+                                    @("+" + item.Amount) <!-- Show as positive otherwise -->
+                                }
+                            </h5>
+
 
 
                             <div class="d-flex">
@@ -81,7 +100,18 @@
                                 <p class="mb-0 text-secondary">To: <span class="fw-bold">@item.ToAccount.AccountName</span></p>
                                 <p class="mb-0 text-secondary" style="font-size: 14px;">@item.ToAccount.AccountNumber</p>
                             </div>
+                           
                         </div>
+                        <h5 style="font-size:14px;">
+                            By
+                                @if (@item.User.Id== ViewBag.CurrentUserId){
+                                <strong style="color:green"> You</strong>
+                                }
+                                else{
+                                <strong style="color:green"> @item.User.Name</strong>
+                                }
+                               
+                        </h5>
                     </div>
                 </div>
             </div>

@@ -25,14 +25,19 @@ namespace Hostel_Management.Controllers
 
         public async Task<IActionResult> Index(int? Id)
         {
-
+            var user = await _userManager.GetUserAsync(User);
             ViewBag.id = Id;
+            ViewBag.CurrentUserId = user?.Id;
             var transactions = _context.Transactions
                 .Where(t => Id == null || t.WalletId == Id)
                 .Include(t => t.Currency)
                 .Include(t => t.FromAccount)
+                .Include(t=>t.User)
                 .Include(t => t.ToAccount);
-            ViewBag.TotalAmount = await transactions.Where(t => t.WalletId == Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
+          
+            ViewBag.SendAmount = await transactions.Where(t => t.WalletId == Id).Where(t=>t.UserId==user.Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
+            ViewBag.ReceiveAmount = await transactions.Where(t => t.WalletId == Id).Where(t=>t.UserId!=user.Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
+            ViewBag.TotalAmount = ViewBag.SendAmount - ViewBag.ReceiveAmount;
             ViewBag.TransactionsCount = await transactions.Where(t => t.WalletId == Id).CountAsync();
             ViewBag.ThisUser = await _context.Wallets
         .Include(w => w.Owner)           // Load Owner
@@ -59,9 +64,7 @@ namespace Hostel_Management.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized(); // Handle unauthenticated user
-
             ViewBag.WalletId = id;
-
             var opposite_user = await _context.Wallets.FindAsync(id);
             if (opposite_user == null) return NotFound(); // Handle invalid wallet ID
 
@@ -81,6 +84,7 @@ namespace Hostel_Management.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TransactionDTO tran)
         {
+            var user = await _userManager.GetUserAsync(User);
             if (!ModelState.IsValid)
                 return View(tran);
 
@@ -88,6 +92,7 @@ namespace Hostel_Management.Controllers
             opposite_Account.Balance += tran.Amount;
             var Owner_Account = _context.BankAccounts.Find(tran.FromAccountId);
             Owner_Account.Balance -= tran.Amount;
+
             var transaction = new Transaction
             {
                 WalletId = tran.WalletId,
@@ -95,6 +100,7 @@ namespace Hostel_Management.Controllers
                 Amount = tran.Amount,
                 FromAccountId = tran.FromAccountId,
                 ToAccountId = tran.ToAccountId,
+                UserId=user.Id,
                 Timestamp = DateTime.UtcNow
             };
             _context.Update(opposite_Account);
