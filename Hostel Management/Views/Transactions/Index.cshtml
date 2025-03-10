@@ -64,11 +64,11 @@
                                 <strong>@item.Currency.Code</strong>
                                 @if (item.User.Id == ViewBag.CurrentUserId)
                                 {
-                                    @("-" + item.Amount) <!-- Show as negative if UserId matches -->
+                                    @("+" + item.Amount) <!-- Show as negative if UserId matches -->
                                 }
                                 else
                                 {
-                                    @("+" + item.Amount) <!-- Show as positive otherwise -->
+                                    @("-" + item.Amount) <!-- Show as positive otherwise -->
                                 }
                             </h5>
 
