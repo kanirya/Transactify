@@ -114,7 +114,7 @@ namespace Hostel_Management.Models.Model
         public virtual ApplicationUser User { get; set; }
 
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
     }
 
 }

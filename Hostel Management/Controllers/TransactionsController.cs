@@ -33,7 +33,7 @@ namespace Hostel_Management.Controllers
                 .Include(t => t.Currency)
                 .Include(t => t.FromAccount)
                 .Include(t=>t.User)
-                .Include(t => t.ToAccount);
+                .Include(t => t.ToAccount).OrderByDescending(u=>u.Timestamp);
           
             ViewBag.SendAmount = await transactions.Where(t => t.WalletId == Id).Where(t=>t.UserId==user.Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
             ViewBag.ReceiveAmount = await transactions.Where(t => t.WalletId == Id).Where(t=>t.UserId!=user.Id).SumAsync(t => (decimal?)t.Amount) ?? 0;
@@ -101,7 +101,7 @@ namespace Hostel_Management.Controllers
                 FromAccountId = tran.FromAccountId,
                 ToAccountId = tran.ToAccountId,
                 UserId=user.Id,
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.Now
             };
             _context.Update(opposite_Account);
             _context.Update(Owner_Account);
