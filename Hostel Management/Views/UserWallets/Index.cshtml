@@ -1,54 +1,63 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.UserWallet>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Wallets";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Your Wallets</h2>
+        <a asp-action="Create" class="btn btn-primary">New Wallet</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Currency)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Timestamp)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Currency.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Timestamp)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <!-- Wallet Cards -->
+    <div class="row">
+        @foreach (var wallet in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm rounded position-relative card-clickable" data-url='@Url.Action("Index", "UserTransactions", new { id = wallet.Id })' style="cursor:pointer;">
+                    <div class="card-body">
+                        <!-- Dropdown Actions -->
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-light btn-sm" type="button" id="dropdownMenu-@wallet.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@wallet.Id">
+                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@wallet.Id">Edit</a></li>
+                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@wallet.Id">Details</a></li>
+                                <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@wallet.Id">Delete</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Wallet Information -->
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fa-solid fa-wallet fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-1">@wallet.Name</h5>
+                                <p class="card-text mb-0"><strong>Currency:</strong> @wallet.Currency.Code</p>
+                                <p class="card-text"><small class="text-muted">Created On: @wallet.Timestamp.ToString("dd-MMM-yyyy")</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Card Click Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".card-clickable").forEach(function (card) {
+            card.addEventListener("click", function (event) {
+                if (!event.target.closest(".dropdown, button, a")) {
+                    window.location.href = card.getAttribute("data-url");
+                }
+            });
+        });
+    });
+</script>

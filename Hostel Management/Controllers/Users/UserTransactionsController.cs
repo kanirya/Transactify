@@ -20,9 +20,10 @@ namespace Hostel_Management.Controllers.Users
         }
 
         // GET: UserTransactions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? id)
         {
             var authDbContext = _context.UserTransactions.Include(u => u.Wallet);
+            //var authDbContext = _context.UserTransactions.Include(u => u.Wallet).Where(u => u.Wallet.Id == id);
             return View(await authDbContext.ToListAsync());
         }
 
