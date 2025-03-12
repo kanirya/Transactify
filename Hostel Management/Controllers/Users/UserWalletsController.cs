@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
+using Hostel_Management.Models.DTOs;
+using Microsoft.AspNetCore.Identity;
+using Hostel_Management.Areas.Identity.Data;
 
 namespace Hostel_Management.Controllers.Users
 {
     public class UserWalletsController : Controller
     {
         private readonly AuthDbContext _context;
-
-        public UserWalletsController(AuthDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public UserWalletsController(AuthDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: UserWallets
@@ -50,7 +54,6 @@ namespace Hostel_Management.Controllers.Users
         public IActionResult Create()
         {
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -59,17 +62,24 @@ namespace Hostel_Management.Controllers.Users
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CurrencyId,UserId,Timestamp")] UserWallet userWallet)
+        public async Task<IActionResult> Create(UserWalletDTO userWal)
         {
+
+            var user = await _userManager.GetUserAsync(User);
+            var userWallet = new UserWallet();
             if (ModelState.IsValid)
             {
                 userWallet.Id = Guid.NewGuid();
+
+                userWallet.UserId = user.Id;
+                userWallet.CurrencyId = userWal.CurrencyId;
+                userWallet.Name = userWal.Name;
+                userWallet.Timestamp = DateTime.Now;
                 _context.Add(userWallet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CurrencyId"] = new SelectList(_context.Currencies, "Id", "Code", userWallet.CurrencyId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userWallet.UserId);
             return View(userWallet);
         }
 
