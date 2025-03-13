@@ -50,7 +50,7 @@ namespace Hostel_Management.Models.Model
         [MaxLength(255)]
         public string? Note { get; set; }  // Made nullable to prevent migration issues
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
     public enum TransactionType

@@ -32,7 +32,7 @@ namespace Hostel_Management.Models.DTOs
         public decimal Amount { get; set; }
 
         [Required]
-        public TransactionType TransactionType { get; set; }
+        public string TransactionType { get; set; }
 
         [MaxLength(255)]
         public string? Note { get; set; }  // Made nullable to prevent migration issues

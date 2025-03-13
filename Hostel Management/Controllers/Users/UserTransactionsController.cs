@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hostel_Management.Data;
 using Hostel_Management.Models.Model;
+using Hostel_Management.Models.DTOs;
 
 namespace Hostel_Management.Controllers.Users
 {
@@ -18,14 +19,22 @@ namespace Hostel_Management.Controllers.Users
         {
             _context = context;
         }
-
-        // GET: UserTransactions
         public async Task<IActionResult> Index(Guid? id)
         {
-            var authDbContext = _context.UserTransactions.Include(u => u.Wallet);
-            //var authDbContext = _context.UserTransactions.Include(u => u.Wallet).Where(u => u.Wallet.Id == id);
+            if (id == null || id == Guid.Empty)
+            {
+                return RedirectToAction("Error", "Home"); // Handle the case where id is null or empty
+            }
+
+            ViewBag.Id = id; // Safe to use now
+
+            var authDbContext = _context.UserTransactions
+                .Include(u => u.Wallet)
+                .Where(u => u.WalletId == id.Value);
+
             return View(await authDbContext.ToListAsync());
         }
+
 
         // GET: UserTransactions/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -47,25 +56,43 @@ namespace Hostel_Management.Controllers.Users
         }
 
         // GET: UserTransactions/Create
-        public IActionResult Create()
+        public IActionResult Create(Guid? id, string createdType)
         {
-            ViewData["WalletId"] = new SelectList(_context.UserWallets, "Id", "Name");
+
+            ViewBag.Id = id;
+            ViewBag.createdType = createdType;
             return View();
         }
 
-        // POST: UserTransactions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,WalletId,Amount,TransactionType,Note,CreatedAt")] UserTransaction userTransaction)
+        public async Task<IActionResult> Create( UserTransactionDTO userTran)
         {
+            Console.WriteLine("Waller ID: " + userTran.WalletId);
+            Console.WriteLine("Transaction type: " + userTran.TransactionType);
+
+            var userTransaction = new UserTransaction();
             if (ModelState.IsValid)
             {
+                if (userTran.TransactionType == "send")
+                {
+                    userTransaction.TransactionType = TransactionType.Debit;
+                }else if(userTran.TransactionType== "receive")
+                {
+                    userTransaction.TransactionType = TransactionType.Credit;
+                }else
+                {
+                    return View(userTransaction);
+                }
+                userTransaction.WalletId = userTran.WalletId;
                 userTransaction.Id = Guid.NewGuid();
+                userTransaction.Note = userTran.Note;
+                userTransaction.Amount = userTran.Amount;
                 _context.Add(userTransaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { id = userTransaction.WalletId });
+
             }
             ViewData["WalletId"] = new SelectList(_context.UserWallets, "Id", "Name", userTransaction.WalletId);
             return View(userTransaction);
