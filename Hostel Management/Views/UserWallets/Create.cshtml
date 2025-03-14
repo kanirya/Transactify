@@ -1,39 +1,345 @@
 ﻿@model Hostel_Management.Models.Model.UserWallet
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create New Wallet";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<div class="wallet-form-container py-4">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+             
+                <li class="breadcrumb-item"><a href="@Url.Action("Index")">Wallets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Create New</li>
+            </ol>
+        </nav>
 
-<h4>UserWallet</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+        <!-- Page Header -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1 fw-bold text-primary">Create New Wallet</h1>
+                <p class="text-muted mb-0">Add a new wallet to manage your finances</p>
             </div>
-            <div class="form-group">
-                <label asp-for="CurrencyId" class="control-label"></label>
-                <select asp-for="CurrencyId" class ="form-control" asp-items="ViewBag.CurrencyId"></select>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Form Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-wallet text-primary me-2"></i>
+                            Wallet Details
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="Create" id="walletForm">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="mb-4">
+                                <label asp-for="Name" class="form-label fw-medium">Wallet Name <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-tag text-muted"></i>
+                                    </span>
+                                    <input asp-for="Name" class="form-control" placeholder="Enter wallet name" required />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                                <div class="form-text">Choose a descriptive name for your wallet (e.g., "Personal Savings", "Travel Fund")</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="CurrencyId" class="form-label fw-medium">Currency <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-money-bill-wave text-muted"></i>
+                                    </span>
+                                    <select asp-for="CurrencyId" class="form-select" asp-items="ViewBag.CurrencyId" required>
+                                        <option value="">-- Select Currency --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CurrencyId" class="text-danger small"></span>
+                                <div class="form-text">Select the currency for this wallet</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                <a asp-action="Index" class="btn btn-light">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save me-2"></i> Create Wallet
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <!-- Sidebar with Help Information -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-primary">About Wallets</h6>
+                            <p class="text-muted mb-0">
+                                Wallets help you organize your finances by category, purpose, or account type. You can create multiple wallets for different purposes.
+                            </p>
+                        </div>
+
+                        <div class="mb-0">
+                            <h6 class="fw-bold">Tips</h6>
+                            <ul class="text-muted ps-3 mb-0">
+                                <li class="mb-2">Choose a clear, descriptive name for your wallet</li>
+                                <li class="mb-2">Select the correct currency for accurate reporting</li>
+                                <li>You can add transactions to your wallet after creation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Currencies Card -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-star me-2"></i>
+                            Popular Currencies
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex align-items-center">
+                                <div class="currency-icon me-3 bg-primary-subtle rounded-circle">
+                                    <span class="fw-bold text-primary">$</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">US Dollar (USD)</h6>
+                                    <small class="text-muted">United States</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <div class="currency-icon me-3 bg-primary-subtle rounded-circle">
+                                    <span class="fw-bold text-primary">€</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Euro (EUR)</h6>
+                                    <small class="text-muted">European Union</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <div class="currency-icon me-3 bg-primary-subtle rounded-circle">
+                                    <span class="fw-bold text-primary">£</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">British Pound (GBP)</h6>
+                                    <small class="text-muted">United Kingdom</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            // Focus on name field when page loads
+            $('#Name').focus();
+
+            // Add custom validation
+            $('#walletForm').on('submit', function(e) {
+                const name = $('#Name').val();
+                const currencyId = $('#CurrencyId').val();
+
+                let isValid = true;
+
+                if (!name || name.trim() === '') {
+                    e.preventDefault();
+                    $('#Name').addClass('is-invalid');
+                    $('#Name').after('<div class="invalid-feedback">Wallet name is required</div>');
+                    isValid = false;
+                }
+
+                if (!currencyId) {
+                    e.preventDefault();
+                    $('#CurrencyId').addClass('is-invalid');
+                    $('#CurrencyId').after('<div class="invalid-feedback">Please select a currency</div>');
+                    isValid = false;
+                }
+
+                return isValid;
+            });
+        });
+    </script>
 }
+
+<style>
+    /* Modern form styling */
+    :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    body {
+        font-family: 'Inter', 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    .wallet-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1.25rem 1.5rem;
+    }
+
+        .card-header h5 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+    /* Form styling */
+    .form-label {
+        color: #495057;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-color: var(--border-color);
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.5rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15);
+        }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: var(--border-color);
+        border-radius: 0.5rem;
+    }
+
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Button styling */
+    .btn {
+        font-weight: 500;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #ced4da;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+    /* Breadcrumb styling */
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--text-muted);
+    }
+
+    /* List group styling */
+    .list-group-item {
+        padding: 1rem 1.5rem;
+        border-left: none;
+        border-right: none;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+    /* Currency icon */
+    .currency-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Page header styling */
+    .page-header h1 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+    
+</style>

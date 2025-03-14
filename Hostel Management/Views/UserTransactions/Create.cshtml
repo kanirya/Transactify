@@ -1,49 +1,406 @@
 ﻿@model Hostel_Management.Models.Model.UserTransaction
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = ViewBag.createdType == "receive" ? "Add Cash In" : "Add Cash Out";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var isCredit = ViewBag.createdType == "receive";
+    var transactionColor = isCredit ? "success" : "danger";
+    var transactionIcon = isCredit ? "arrow-down" : "arrow-up";
+    var transactionText = isCredit ? "Cash In" : "Cash Out";
 }
 
-<h1>Create</h1>
+<div class="transaction-form-container py-4">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "UserWallets")">Home</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Index",new{id=@ViewBag.Id} )">Transactions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@transactionText</li>
+            </ol>
+        </nav>
 
-<h4>UserTransaction</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input name="TransactionType" value="@ViewBag.createdType" type="hidden" />
-            <input type="hidden" name="WalletId" value="@ViewBag.Id" />
-           
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" type="number" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
+        <!-- Page Header -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1 text-gray-800">@transactionText Transaction</h1>
+                <p class="text-muted mb-0">Add a new @transactionText transaction to your wallet</p>
+            </div>
+            <a href="@Url.Action("Index",new{id=ViewBag.Id})" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Transactions
+            </a>
+        </div>
+
+        <!-- Transaction Form Card -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-@transactionIcon text-@transactionColor me-2"></i>
+                            @transactionText Details
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="Create" id="transactionForm">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                            <input name="TransactionType" value="@ViewBag.createdType" type="hidden" />
+                            <input type="hidden" name="WalletId" value="@ViewBag.Id" />
+
+                            <div class="mb-4">
+                                <label asp-for="Amount" class="form-label fw-medium">Amount <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="Amount" class="form-control form-control-lg" type="number" step="0.01" min="0.01" required placeholder="Enter amount" />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger small"></span>
+                                <div class="form-text">Enter the amount for this transaction</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Note" class="form-label fw-medium">Note</label>
+                                <textarea asp-for="Note" class="form-control" rows="4" placeholder="Add a note about this transaction (optional)"></textarea>
+                                <span asp-validation-for="Note" class="text-danger small"></span>
+                                <div class="form-text">Add details about the purpose of this transaction</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="CreatedAt" class="form-label fw-medium">Transaction Date <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    <input asp-for="CreatedAt" class="form-control" type="datetime-local" required />
+                                </div>
+                                <span asp-validation-for="CreatedAt" class="text-danger small"></span>
+                                <div class="form-text">Select the date and time of this transaction</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                <a href="@Url.Action("Index")" class="btn btn-light">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-@transactionColor px-4">
+                                    <i class="fas fa-@transactionIcon me-1"></i> Create @transactionText
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Note" class="control-label"></label>
-                <textarea asp-for="Note" class="form-control" rows="5"></textarea>
-                <span asp-validation-for="Note" class="text-danger"></span>
-            </div>
+            <!-- Sidebar with Help Information -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-@transactionColor">About @transactionText</h6>
+                            <p class="text-muted mb-0">
+                                @if (isCredit)
+                                {
+                                    <span>Cash In transactions represent money coming into your wallet, such as income, deposits, or refunds.</span>
+                                }
+                                else
+                                {
+                                    <span>Cash Out transactions represent money leaving your wallet, such as expenses, withdrawals, or payments.</span>
+                                }
+                            </p>
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                        <div class="mb-0">
+                            <h6 class="fw-bold">Tips</h6>
+                            <ul class="text-muted ps-3 mb-0">
+                                <li class="mb-2">Enter the exact amount for accurate record keeping</li>
+                                <li class="mb-2">Add detailed notes to help track your transactions</li>
+                                <li>Set the correct date and time for proper reporting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-bolt me-2"></i>
+                            Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="@Url.Action("Index",new{id=ViewBag.Id})" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-list me-3 text-muted"></i>
+                                <span>View All Transactions</span>
+                            </a>
+                            <a href="@Url.Action("Create", new { id = @ViewBag.Id, createdType = isCredit ? "send" : "receive" })" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-@(isCredit ? "arrow-up" : "arrow-down") me-3 text-@(isCredit ? "danger" : "success")"></i>
+                                <span>Add @(isCredit ? "Cash Out" : "Cash In") Instead</span>
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" onclick="prefillCommonTransaction(); return false;">
+                                <i class="fas fa-magic me-3 text-primary"></i>
+                                <span>Use Common Transaction</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            // Set default date to current date and time
+            if (!$('#CreatedAt').val()) {
+                $('#CreatedAt').val(new Date().toISOString().slice(0, 16));
+            }
+
+            // Focus on amount field when page loads
+            $('#Amount').focus();
+
+            // Add custom validation
+            $('#transactionForm').on('submit', function(e) {
+                const amount = parseFloat($('#Amount').val());
+                if (amount <= 0) {
+                    e.preventDefault();
+                    $('#Amount').addClass('is-invalid');
+                    $('#Amount').after('<div class="invalid-feedback">Amount must be greater than zero</div>');
+                    return false;
+                }
+                return true;
+            });
+        });
+
+        // Function to prefill common transaction amounts
+        function prefillCommonTransaction() {
+            const isCredit = '@isCredit' === 'True';
+
+            // Show modal with common transaction options
+            const commonOptions = isCredit ?
+                [
+                    { amount: 100, note: "Salary deposit" },
+                    { amount: 50, note: "Refund" },
+                    { amount: 20, note: "Gift received" }
+                ] :
+                [
+                    { amount: 25, note: "Food expense" },
+                    { amount: 50, note: "Utility bill" },
+                    { amount: 10, note: "Transportation" }
+                ];
+
+            let modalHtml = `
+                <div class="modal fade" id="commonTransactionsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Common ${isCredit ? 'Cash In' : 'Cash Out'} Transactions</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="list-group">`;
+
+            commonOptions.forEach(option => {
+                modalHtml += `
+                    <button type="button" class="list-group-item list-group-item-action"
+                        onclick="selectCommonTransaction(${option.amount}, '${option.note}')">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>${option.note}</span>
+                            <span class="badge bg-${isCredit ? 'success' : 'danger'} rounded-pill">$${option.amount.toFixed(2)}</span>
+                        </div>
+                    </button>`;
+            });
+
+            modalHtml += `
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Add modal to body and show it
+            $('body').append(modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('commonTransactionsModal'));
+            modal.show();
+
+            // Remove modal from DOM when hidden
+            $('#commonTransactionsModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+        }
+
+        // Function to select a common transaction
+        function selectCommonTransaction(amount, note) {
+            $('#Amount').val(amount);
+            $('#Note').val(note);
+            bootstrap.Modal.getInstance(document.getElementById('commonTransactionsModal')).hide();
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Modern form styling */
+        :root {
+            --primary-color: #714B67;
+            --primary-hover: #5D3E56;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-success: #e6f7e9;
+            --light-danger: #fbe7e9;
+            --light-primary: #f0e8f0;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .transaction-form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Card styling */
+        .card {
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+            .card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.25rem 1.5rem;
+        }
+
+            .card-header h5 {
+                margin: 0;
+                color: #333;
+                font-weight: 600;
+            }
+
+        /* Form styling */
+        .form-label {
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-color: var(--border-color);
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15);
+            }
+
+        .form-control-lg {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: var(--border-color);
+        }
+
+        .form-text {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Button styling */
+        .btn {
+            font-weight: 500;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #ced4da;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #f8f9fa;
+                color: #495057;
+            }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-muted);
+        }
+
+        /* List group styling */
+        .list-group-item {
+            padding: 1rem 1.5rem;
+            border-left: none;
+            border-right: none;
+            transition: background-color 0.2s;
+        }
+
+            .list-group-item:first-child {
+                border-top: none;
+            }
+
+            .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        /* Page header styling */
+        .page-header h1 {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Responsive adjustments */
+     
+    </style>
 }

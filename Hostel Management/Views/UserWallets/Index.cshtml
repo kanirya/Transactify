@@ -1,51 +1,116 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.UserWallet>
 
 @{
-    ViewData["Title"] = "Wallets";
+    ViewData["Title"] = "My Wallets";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-4">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Your Wallets</h2>
-        <a asp-action="Create" class="btn btn-primary">New Wallet</a>
-    </div>
+<div class="wallet-dashboard py-4">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1 fw-bold text-primary">My Wallets</h1>
+                <p class="text-muted mb-0">Select a wallet to view transactions</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Wallet
+            </a>
+        </div>
 
-    <!-- Wallet Cards -->
-    <div class="row">
-        @foreach (var wallet in Model)
-        {
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm rounded position-relative card-clickable" data-url='@Url.Action("Index", "UserTransactions", new { id = wallet.Id })' style="cursor:pointer;">
-                    <div class="card-body">
-                        <!-- Dropdown Actions -->
-                        <div class="dropdown position-absolute top-0 end-0 m-2">
-                            <button class="btn btn-light btn-sm" type="button" id="dropdownMenu-@wallet.Id" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@wallet.Id">
-                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@wallet.Id">Edit</a></li>
-                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@wallet.Id">Details</a></li>
-                                <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@wallet.Id">Delete</a></li>
-                            </ul>
-                        </div>
+        <!-- Wallet Cards -->
+        <div class="row g-4">
+            @if (Model.Any())
+            {
+                @foreach (var wallet in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="wallet-card card border-0 shadow-sm h-100">
+                            <div class="card-body p-0">
+                                <!-- Card Header -->
+                                <div class="wallet-card-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <div class="wallet-icon-container bg-primary-subtle rounded-circle me-2">
+                                            <i class="fas fa-wallet text-primary"></i>
+                                        </div>
+                                        <h3 class="card-title h6 fw-bold mb-0 text-truncate">@wallet.Name</h3>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-icon" type="button" id="dropdownMenu-@wallet.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-vertical text-muted"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="dropdownMenu-@wallet.Id">
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center" asp-action="Edit" asp-route-id="@wallet.Id">
+                                                    <i class="fas fa-edit me-2 text-primary"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center" asp-action="Details" asp-route-id="@wallet.Id">
+                                                    <i class="fas fa-info-circle me-2 text-info"></i> Details
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center text-danger" asp-action="Delete" asp-route-id="@wallet.Id">
+                                                    <i class="fas fa-trash-alt me-2"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
 
-                        <!-- Wallet Information -->
-                        <div class="d-flex align-items-center">
-                            <div class="me-3">
-                                <i class="fa-solid fa-wallet fa-2x text-primary"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">@wallet.Name</h5>
-                                <p class="card-text mb-0"><strong>Currency:</strong> @wallet.Currency.Code</p>
-                                <p class="card-text"><small class="text-muted">Created On: @wallet.Timestamp.ToString("dd-MMM-yyyy")</small></p>
+                                <!-- Card Content -->
+                                <div class="wallet-card-content p-3 card-clickable" data-url='@Url.Action("Index", "UserTransactions", new { id = wallet.Id })'>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="badge bg-primary-subtle text-primary">
+                                            <i class="fas fa-money-bill-wave me-1"></i> @wallet.Currency.Code
+                                        </div>
+                                        <div class="badge bg-success-subtle text-success">
+                                            Active
+                                        </div>
+                                    </div>
+
+                                    <div class="wallet-info">
+                                       
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="text-muted small">Created On</span>
+                                            <span class="fw-medium">@wallet.Timestamp.ToString("dd MMM, yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="wallet-card-footer d-flex border-top">
+                                    <a href="@Url.Action("Create", "UserTransactions", new { id = wallet.Id, createdType = "receive" })" class="flex-grow-1 btn btn-light border-end rounded-0 py-2">
+                                        <i class="fas fa-arrow-down text-success me-1"></i> Cash In
+                                    </a>
+                                    <a href="@Url.Action("Create", "UserTransactions", new { id = wallet.Id, createdType = "send" })" class="flex-grow-1 btn btn-light rounded-0 py-2">
+                                        <i class="fas fa-arrow-up text-danger me-1"></i> Cash Out
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="empty-state card border-0 shadow-sm text-center p-5">
+                        <div class="empty-state-icon mb-3">
+                            <i class="fas fa-wallet text-muted fa-3x"></i>
+                        </div>
+                        <h3 class="h5 mb-2">No Wallets Found</h3>
+                        <p class="text-muted mb-3">You haven't created any wallets yet.</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Your First Wallet
+                        </a>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>
 
@@ -61,3 +126,141 @@
         });
     });
 </script>
+
+<style>
+    /* Modern wallet dashboard styling */
+    :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    body {
+        font-family: 'Inter', 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    /* Page header */
+    .page-header h1 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .wallet-card {
+        height: 100%;
+    }
+
+        .wallet-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+        }
+
+    .wallet-card-content {
+        cursor: pointer;
+    }
+
+    /* Icon styling */
+    .wallet-icon-container {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Button styling */
+    .btn {
+        font-weight: 500;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+        .btn-icon:hover {
+            background-color: #f0f0f0;
+        }
+
+    .wallet-card-footer .btn {
+        transition: background-color 0.2s;
+    }
+
+        .wallet-card-footer .btn:hover {
+            background-color: #f0f0f0;
+        }
+
+    /* Badge styling */
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        border-radius: 0.5rem;
+    }
+
+    .bg-primary-subtle {
+        background-color: var(--light-primary);
+    }
+
+    .bg-success-subtle {
+        background-color: var(--light-success);
+    }
+
+    .bg-danger-subtle {
+        background-color: var(--light-danger);
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    .text-success {
+        color: var(--success-color) !important;
+    }
+
+    .text-danger {
+        color: var(--danger-color) !important;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+        border-radius: 0.75rem;
+    }
+
+    .empty-state-icon {
+        color: #dee2e6;
+    }
+</style>

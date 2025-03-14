@@ -97,14 +97,14 @@
 
     <!-- Dashboard Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted fw-normal mb-0">Total Credit</h6>
                             <h3 class="fw-bold text-success mb-0">
-                                $@Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount).ToString("N2")
+                                @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount).ToString("N2")
                             </h3>
                         </div>
                         <div class="icon-shape bg-light-success text-success rounded p-3">
@@ -117,14 +117,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted fw-normal mb-0">Total Debit</h6>
                             <h3 class="fw-bold text-danger mb-0">
-                                $@Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount).ToString("N2")
+                                @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount).ToString("N2")
                             </h3>
                         </div>
                         <div class="icon-shape bg-light-danger text-danger rounded p-3">
@@ -137,7 +137,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -147,8 +147,10 @@
                                 var netAmount = Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount) -
                                 Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount);
                                 var textColorClass = netAmount >= 0 ? "text-primary" : "text-danger";
+
+                               
                             }
-                            <h3 class="fw-bold @textColorClass mb-0">$@netAmount.ToString("N2")</h3>
+                            <h3 class="fw-bold @textColorClass mb-0">@ViewBag.CurrencyCode @netAmount.ToString("N2")</h3>
                         </div>
                         <div class="icon-shape bg-light-primary text-primary rounded p-3">
                             <i class="fas fa-wallet"></i>
@@ -160,7 +162,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -191,7 +193,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>@Html.DisplayNameFor(model => model.Wallet)</th>
+                         
                             <th>@Html.DisplayNameFor(model => model.Amount)</th>
                             <th>@Html.DisplayNameFor(model => model.TransactionType)</th>
                             <th>@Html.DisplayNameFor(model => model.Note)</th>
@@ -211,15 +213,15 @@
                             data-wallet="@item.Wallet.Id"
                             data-date="@item.CreatedAt.ToString("yyyy-MM-dd")">
                                 <td>@index</td>
-                                <td>@Html.DisplayFor(modelItem => item.Wallet.Name)</td>
-                                <td class="fw-medium">$@item.Amount.ToString("N2")</td>
+                               
+                                <td class="fw-medium">@ViewBag.CurrencyCode @item.Amount.ToString("N2")</td>
                                 <td>
                                     <span class="badge @(item.TransactionType.ToString() == "Receive" ? "bg-success" : "bg-danger")">
                                         @Html.DisplayFor(modelItem => item.TransactionType)
                                     </span>
                                 </td>
                                 <td>@Html.DisplayFor(modelItem => item.Note)</td>
-                                <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm tt")</td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -288,215 +290,35 @@
     </a>
 </div>
 
-@section Styles {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
-    <style>
-        /* Odoo-inspired styles */
-        :root {
-        --primary-color: #714B67;
-        --primary-hover: #5D3E56;
-        --success-color: #28a745;
-        --danger-color: #dc3545;
-        --light-success: #e6f7e9;
-        --light-danger: #fbe7e9;
-        --light-primary: #f0e8f0;
-        --light-dark: #f1f1f1;
-        --border-color: #e9ecef;
-        --text-muted: #6c757d;
-        }
-
-        body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f8f9fa;
-        color: #212529;
-        }
-
-        .transaction-dashboard {
-        padding: 1.5rem;
-        }
-
-        .page-header h1 {
-        color: var(--primary-color);
-        font-weight: 500;
-        }
-
-        .card {
-        border: none;
-        border-radius: 0.5rem;
-        transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .icon-shape {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        }
-
-        .bg-light-success {
-        background-color: var(--light-success);
-        }
-
-        .bg-light-danger {
-        background-color: var(--light-danger);
-        }
-
-        .bg-light-primary {
-        background-color: var(--light-primary);
-        }
-
-        .bg-light-dark {
-        background-color: var(--light-dark);
-        }
-
-        .text-success {
-        color: var(--success-color) !important;
-        }
-
-        .text-danger {
-        color: var(--danger-color) !important;
-        }
-
-        .text-primary {
-        color: var(--primary-color) !important;
-        }
-
-        .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover, .btn-primary:focus {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
-        }
-
-        .table {
-        color: #212529;
-        }
-
-        .table thead th {
-        background-color: #f8f9fa;
-        color: var(--text-muted);
-        font-weight: 500;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        border-top: none;
-        border-bottom: 1px solid var(--border-color);
-        }
-
-        .table tbody tr {
-        border-bottom: 1px solid var(--border-color);
-        }
-
-        .table tbody tr:hover {
-        background-color: rgba(113, 75, 103, 0.05);
-        }
-
-        .dropdown-item i {
-        width: 1rem;
-        }
-
-        .badge {
-        padding: 0.4em 0.65em;
-        font-weight: 500;
-        }
-
-        .action-buttons {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        z-index: 1000;
-        }
-
-        .btn-circle {
-        width: 3.5rem;
-        height: 3.5rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-circle i {
-        font-size: 1.25rem;
-        }
-
-        /* Pagination styling */
-        .page-link {
-        color: var(--primary-color);
-        border: 1px solid var(--border-color);
-        }
-
-        .page-item.active .page-link {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        }
-
-        /* Filter panel styling */
-        #filterPanel {
-        border-radius: 0.5rem;
-        }
-
-        .form-label {
-        color: var(--text-muted);
-        font-size: 0.875rem;
-        font-weight: 500;
-        }
-
-        .form-control, .form-select {
-        border-color: var(--border-color);
-        padding: 0.5rem 0.75rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.25);
-        }
-
-        /* Responsive adjustments */
-        
-    Edit
-    (max-width: 768px) {
-    .transaction-dashboard
-
-        {
-            padding: 1rem;
-        }
-
-        .action-buttons {
-            bottom: 1rem;
-            right: 1rem;
-        }
-
-        }
-    </style>
-}
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Initialize date range picker
+            // Initialize date range picker with single month view
             $('#dateRangePicker').daterangepicker({
                 opens: 'left',
                 autoUpdateInput: false,
                 locale: {
                     cancelLabel: 'Clear',
                     format: 'MM/DD/YYYY'
-                }
+                },
+                showDropdowns: true,
+                ranges: {
+                   'Today': [moment(), moment()],
+                   'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                   'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                   'This Month': [moment().startOf('month'), moment().endOf('month')],
+                   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                maxDate: moment(),
+                // Fix for showing only one month
+                singleDatePicker: false,
+                showCustomRangeLabel: true,
+                linkedCalendars: false // This is the key fix to show only one calendar
             });
 
             $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
@@ -524,7 +346,7 @@
                 updateDashboardSummary();
             });
 
-            // Filter transactions function
+            // Filter transactions function - FIXED to properly handle transaction types
             function filterTransactions() {
                 const dateRange = $('#dateRangePicker').val();
                 const transactionType = $('#transactionType').val();
@@ -542,7 +364,8 @@
 
                 $('.transaction-row').each(function() {
                     const $row = $(this);
-                    const rowType = $row.data('type');
+                    // Fix: Get the badge text content for transaction type
+                    const rowType = $row.find('td:eq(3) .badge').text().trim();
                     const rowAmount = parseFloat($row.data('amount'));
                     const rowWallet = $row.data('wallet').toString();
                     const rowDate = moment($row.data('date'));
@@ -554,9 +377,14 @@
                         showRow = false;
                     }
 
-                    // Filter by transaction type
-                    if (transactionType && rowType !== transactionType) {
-                        showRow = false;
+                    // Filter by transaction type - FIXED to match dropdown values with badge text
+                    if (transactionType && transactionType !== '') {
+                        // Check if the selected type matches the row type
+                        if (transactionType === 'Receive' && rowType !== 'Credit') {
+                            showRow = false;
+                        } else if (transactionType === 'Send' && rowType !== 'Debit') {
+                            showRow = false;
+                        }
                     }
 
                     // Filter by amount range
@@ -583,12 +411,13 @@
 
                 $('.transaction-row:visible').each(function() {
                     const $row = $(this);
-                    const rowType = $row.data('type');
+                    // Fix: Get the badge text content
+                    const rowType = $row.find('td:eq(3) .badge').text().trim();
                     const rowAmount = parseFloat($row.data('amount'));
 
-                    if (rowType === 'Receive') {
+                    if (rowType === 'Credit') {
                         totalCredit += rowAmount;
-                    } else if (rowType === 'Send') {
+                    } else if (rowType === 'Debit') {
                         totalDebit += rowAmount;
                     }
 
@@ -601,12 +430,16 @@
                 // Update the dashboard cards
                 $('.card:eq(0) h3').text('$' + totalCredit.toFixed(2));
                 $('.card:eq(0) .mt-3 span').text(
-                    $('.transaction-row:visible[data-type="Receive"]').length + ' transactions'
+                    $('.transaction-row:visible').filter(function() {
+                        return $(this).find('td:eq(3) .badge').text().trim() === 'Credit';
+                    }).length + ' transactions'
                 );
 
                 $('.card:eq(1) h3').text('$' + totalDebit.toFixed(2));
                 $('.card:eq(1) .mt-3 span').text(
-                    $('.transaction-row:visible[data-type="Send"]').length + ' transactions'
+                    $('.transaction-row:visible').filter(function() {
+                        return $(this).find('td:eq(3) .badge').text().trim() === 'Debit';
+                    }).length + ' transactions'
                 );
 
                 $('.card:eq(2) h3').removeClass('text-primary text-danger').addClass(netClass).text('$' + netAmount.toFixed(2));
@@ -644,11 +477,483 @@
                 document.body.removeChild(link);
             });
 
-            // Print report
+            // Professional PDF Report Generation
             $('#printReport').click(function(e) {
                 e.preventDefault();
-                window.print();
+                generateProfessionalPDF();
             });
+
+            function generateProfessionalPDF() {
+                // Show loading indicator
+                $('body').append('<div id="pdfLoading" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-white bg-opacity-75" style="z-index:9999"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Generating PDF...</span></div>');
+
+                // Get date range for report title
+                const dateRange = $('#dateRangePicker').val() || 'All Time';
+                const reportTitle = dateRange !== 'All Time' ? `Transaction Report (${dateRange})` : 'Transaction Report (All Time)';
+
+                // Get visible transactions
+                const visibleTransactions = [];
+                $('.transaction-row:visible').each(function() {
+                    const $row = $(this);
+                    const cells = $row.find('td');
+
+                    visibleTransactions.push({
+                        id: $(cells[0]).text(),
+                        wallet: $(cells[1]).text(),
+                        amount: $(cells[2]).text(),
+                        type: $(cells[3]).text().trim(),
+                        note: $(cells[4]).text(),
+                        date: $(cells[5]).text()
+                    });
+                });
+
+                // Create PDF document
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Add header
+                doc.setFontSize(18);
+                doc.setTextColor(113, 75, 103); // Primary color
+                doc.text('Hostel Management System', 105, 20, { align: 'center' });
+
+                doc.setFontSize(14);
+                doc.text(reportTitle, 105, 30, { align: 'center' });
+
+                // Add date and time of generation
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const now = new Date();
+                doc.text(`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 105, 40, { align: 'center' });
+
+                // Add summary section
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Summary', 14, 55);
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(14, 58, 196, 58);
+
+                // Calculate summary data
+                const totalCredit = parseFloat($('.card:eq(0) h3').text().replace('$', ''));
+                const totalDebit = parseFloat($('.card:eq(1) h3').text().replace('$', ''));
+                const netBalance = parseFloat($('.card:eq(2) h3').text().replace('$', ''));
+                const totalTransactions = parseInt($('.card:eq(3) h3').text());
+
+                // Add summary table
+                doc.setFontSize(10);
+                doc.text('Total Credit:', 20, 68);
+                doc.text(`$${totalCredit.toFixed(2)}`, 70, 68);
+
+                doc.text('Total Debit:', 20, 76);
+                doc.text(`$${totalDebit.toFixed(2)}`, 70, 76);
+
+                doc.text('Net Balance:', 20, 84);
+                doc.text(`$${netBalance.toFixed(2)}`, 70, 84);
+
+                doc.text('Total Transactions:', 20, 92);
+                doc.text(`${totalTransactions}`, 70, 92);
+
+                // Add transactions table
+                doc.setFontSize(12);
+                doc.text('Transaction Details', 14, 110);
+                doc.line(14, 113, 196, 113);
+
+                // Table headers
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text('ID', 15, 122);
+                doc.text('Wallet', 30, 122);
+                doc.text('Amount', 80, 122);
+                doc.text('Type', 110, 122);
+                doc.text('Note', 130, 122);
+                doc.text('Date', 170, 122);
+
+                doc.line(14, 125, 196, 125);
+
+                // Table rows
+                let y = 133;
+                doc.setTextColor(0, 0, 0);
+
+                visibleTransactions.forEach((transaction, index) => {
+                    // Add new page if needed
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+
+                        // Add header to new page
+                        doc.setFontSize(10);
+                        doc.setTextColor(100, 100, 100);
+                        doc.text('ID', 15, y);
+                        doc.text('Wallet', 30, y);
+                        doc.text('Amount', 80, y);
+                        doc.text('Type', 110, y);
+                        doc.text('Note', 130, y);
+                        doc.text('Date', 170, y);
+
+                        doc.line(14, y + 3, 196, y + 3);
+                        y += 11;
+                        doc.setTextColor(0, 0, 0);
+                    }
+
+                    // Set color for transaction type
+                    if (transaction.type === 'Credit') {
+                        doc.setTextColor(40, 167, 69); // Green
+                    } else {
+                        doc.setTextColor(220, 53, 69); // Red
+                    }
+                    doc.text(transaction.type, 110, y);
+                    doc.setTextColor(0, 0, 0);
+
+                    // Other columns
+                    doc.text(transaction.id, 15, y);
+
+                    // Truncate wallet name if too long
+                    const walletName = transaction.wallet.length > 20 ?
+                        transaction.wallet.substring(0, 17) + '...' : transaction.wallet;
+                    doc.text(walletName, 30, y);
+
+                    doc.text(transaction.amount, 80, y);
+
+                    // Truncate note if too long
+                    const note = transaction.note.length > 15 ?
+                        transaction.note.substring(0, 12) + '...' : transaction.note;
+                    doc.text(note, 130, y);
+
+                    doc.text(transaction.date, 170, y);
+
+                    // Add light gray line between rows
+                    if (index < visibleTransactions.length - 1) {
+                        doc.setDrawColor(240, 240, 240);
+                        doc.line(14, y + 3, 196, y + 3);
+                    }
+
+                    y += 8;
+                });
+
+                // Add footer
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(`Page ${i} of ${pageCount}`, 196, 285, { align: 'right' });
+                    doc.text('© Hostel Management System', 14, 285);
+                }
+
+                // Save the PDF
+                doc.save('transaction_report.pdf');
+
+                // Remove loading indicator
+                $('#pdfLoading').remove();
+            }
         });
     </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+    <style>
+        /* Modern minimalistic styles */
+        :root {
+            --primary-color: #714B67;
+            --primary-hover: #5D3E56;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-success: #e6f7e9;
+            --light-danger: #fbe7e9;
+            --light-primary: #f0e8f0;
+            --light-dark: #f1f1f1;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .transaction-dashboard {
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* Card styling */
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.25rem 1.5rem;
+        }
+
+            .card-header h5 {
+                margin: 0;
+                color: #333;
+                font-weight: 600;
+            }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Icon styling */
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        /* Button styling */
+        .btn {
+            font-weight: 500;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+            .btn-primary:hover, .btn-primary:focus {
+                background-color: var(--primary-hover);
+                border-color: var(--primary-hover);
+                box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.25);
+            }
+
+        .btn-light {
+            background-color: #fff;
+            border-color: #e9ecef;
+            color: #495057;
+        }
+
+            .btn-light:hover {
+                background-color: #f8f9fa;
+                border-color: #dde2e6;
+                color: #212529;
+            }
+
+        /* Table styling */
+        .table {
+            color: #212529;
+            margin-bottom: 0;
+        }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                color: var(--text-muted);
+                font-weight: 500;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+                border-top: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.75rem 1rem;
+            }
+
+            .table tbody tr {
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .table tbody td {
+                padding: 1rem;
+                vertical-align: middle;
+            }
+
+            .table tbody tr:hover {
+                background-color: rgba(113, 75, 103, 0.03);
+            }
+
+        /* Badge styling */
+        .badge {
+            padding: 0.4em 0.65em;
+            font-weight: 500;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .bg-success {
+            background-color: var(--light-success) !important;
+            color: var(--success-color) !important;
+        }
+
+        .bg-danger {
+            background-color: var(--light-danger) !important;
+            color: var(--danger-color) !important;
+        }
+
+        /* Filter panel styling */
+        #filterPanel {
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-color: var(--border-color);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15);
+            }
+
+        .input-group-text {
+            background-color: #fff;
+            border-color: var(--border-color);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 1000;
+        }
+
+        .btn-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .btn-circle:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-circle i {
+                font-size: 1.25rem;
+            }
+
+        /* Pagination styling */
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .page-link {
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Date range picker customization */
+        .daterangepicker {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: none;
+            font-family: 'Inter', 'Roboto', sans-serif;
+        }
+
+            .daterangepicker .calendar-table {
+                border-radius: 0.5rem;
+            }
+
+            .daterangepicker td.active, .daterangepicker td.active:hover {
+                background-color: var(--primary-color);
+            }
+
+            .daterangepicker .ranges li.active {
+                background-color: var(--primary-color);
+            }
+
+        /* Loading indicator */
+        #pdfLoading {
+            background-color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Responsive adjustments */
+      
+        .card-body {
+            padding: 1rem;
+        }
+
+        .table thead th, .table tbody td {
+            padding: 0.75rem;
+        }
+
+        .action-buttons {
+            bottom: 1rem;
+            right: 1rem;
+        }
+
+        .btn-circle {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        
+
+        /* Print styles */
+         .print {
+            .action-buttons, .btn, .dropdown, #filterToggle, .page-header .d-flex
+
+        {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            break-inside: avoid;
+        }
+
+        .transaction-dashboard {
+            padding: 0 !important;
+        }
+
+        body {
+            background-color: white !important;
+        }
+
+        }
+    </style>
 }

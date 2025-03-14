@@ -28,11 +28,30 @@ namespace Hostel_Management.Controllers.Users
 
             ViewBag.Id = id; // Safe to use now
 
-            var authDbContext = _context.UserTransactions
+            var transactions = await _context.UserTransactions
                 .Include(u => u.Wallet)
-                .Where(u => u.WalletId == id.Value);
+                .ThenInclude(w => w.Currency) // Include Currency to access CurrencyCode
+                .Where(u => u.WalletId == id.Value)
+                .ToListAsync();
 
-            return View(await authDbContext.ToListAsync());
+
+
+            // Get the Currency Code from the first transaction's Wallet
+            var Code = transactions.FirstOrDefault()?.Wallet?.Currency?.Code ?? "$";
+
+            if (Code == "PKR")
+            {
+                ViewBag.CurrencyCode = "Rs";
+            }else if (Code == "USD")
+            {
+                ViewBag.CurrencyCode = "$";
+            }
+            else
+            {
+                ViewBag.CurrencyCode = Code;
+            }
+
+            return View( transactions);
         }
 
 
@@ -145,7 +164,7 @@ namespace Hostel_Management.Controllers.Users
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { id = userTransaction.WalletId });
             }
             ViewData["WalletId"] = new SelectList(_context.UserWallets, "Id", "Name", userTransaction.WalletId);
             return View(userTransaction);
@@ -182,7 +201,7 @@ namespace Hostel_Management.Controllers.Users
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { id = userTransaction.WalletId });
         }
 
         private bool UserTransactionExists(Guid id)
