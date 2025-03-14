@@ -1,60 +1,654 @@
-﻿@model IEnumerable<Hostel_Management.Models.Model.UserTransaction>
+﻿@using Microsoft.CodeAnalysis.Differencing
+@using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor
+@model IEnumerable<Hostel_Management.Models.Model.UserTransaction>
 
 @{
     ViewData["Title"] = "Transactions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-center text-primary">User Transactions</h1>
+<div class="transaction-dashboard">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">User Transactions</h1>
+        <div class="d-flex">
+            <button id="filterToggle" class="btn btn-light me-2">
+                <i class="fas fa-filter"></i> Filters
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-plus"></i> Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionDropdown">
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "receive" })">
+                            <i class="fas fa-arrow-down text-success"></i> Cash In
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "send" })">
+                            <i class="fas fa-arrow-up text-danger"></i> Cash Out
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="exportCsv">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="printReport">
+                            <i class="fas fa-print"></i> Print
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover shadow-sm rounded">
-        <thead class="bg-dark text-white">
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.Wallet)</th>
-                <th>@Html.DisplayNameFor(model => model.Amount)</th>
-                <th>@Html.DisplayNameFor(model => model.TransactionType)</th>
-                <th>@Html.DisplayNameFor(model => model.Note)</th>
-                <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
-                <th class="text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Wallet.Name)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Amount)</td>
-                    <td>
-
-                        <span class="badge @(item.TransactionType.ToString() == "Receive" ? "bg-success" : "bg-danger")">
-                            @Html.DisplayFor(modelItem => item.TransactionType)
+    <!-- Filter Panel -->
+    <div id="filterPanel" class="card shadow-sm mb-4" style="display: none;">
+        <div class="card-body">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <div class="input-group">
+                        <input type="text" id="dateRangePicker" class="form-control" placeholder="Select date range">
+                        <span class="input-group-text">
+                            <i class="fas fa-calendar"></i>
                         </span>
-                    </td>
-                    <td>@Html.DisplayFor(modelItem => item.Note)</td>
-                    <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-                    <td class="text-center">
-                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        <a class="btn btn-sm btn-info text-white" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Transaction Type</label>
+                    <select id="transactionType" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="Receive">Credit (Receive)</option>
+                        <option value="Send">Debit (Send)</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Amount Range</label>
+                    <div class="input-group">
+                        <input type="number" id="minAmount" class="form-control" placeholder="Min">
+                        <span class="input-group-text">to</span>
+                        <input type="number" id="maxAmount" class="form-control" placeholder="Max">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Wallet</label>
+                    <select id="walletFilter" class="form-select">
+                        <option value="">All Wallets</option>
+                        @foreach (var wallet in Model.Select(x => x.Wallet).DistinctBy(w => w.Id))
+                        {
+                            <option value="@wallet.Id">@wallet.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="button" id="resetFilters" class="btn btn-light me-2">Reset</button>
+                    <button type="button" id="applyFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<!-- Fixed Bottom Buttons -->
-<div class="fixed-bottom bg-white shadow p-3 text-center">
-    <div class="container">
-        <a asp-action="Create" asp-route-id="@ViewBag.Id" asp-route-createdType="receive" class="btn btn-success btn-lg mx-2">
-            <i class="fas fa-arrow-down"></i> Cash In
-        </a>
-        <a asp-action="Create" asp-route-id="@ViewBag.Id" asp-route-createdType="send" class="btn btn-danger btn-lg mx-2">
-            <i class="fas fa-arrow-up"></i> Cash Out
-        </a>
+    <!-- Dashboard Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-normal mb-0">Total Credit</h6>
+                            <h3 class="fw-bold text-success mb-0">
+                                $@Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount).ToString("N2")
+                            </h3>
+                        </div>
+                        <div class="icon-shape bg-light-success text-success rounded p-3">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 mb-0 text-muted small">
+                        <span>@Model.Count(x => x.TransactionType.ToString() == "Credit") transactions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-normal mb-0">Total Debit</h6>
+                            <h3 class="fw-bold text-danger mb-0">
+                                $@Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount).ToString("N2")
+                            </h3>
+                        </div>
+                        <div class="icon-shape bg-light-danger text-danger rounded p-3">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 mb-0 text-muted small">
+                        <span>@Model.Count(x => x.TransactionType.ToString() == "Debit") transactions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-normal mb-0">Net Balance</h6>
+                            @{
+                                var netAmount = Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount) -
+                                Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount);
+                                var textColorClass = netAmount >= 0 ? "text-primary" : "text-danger";
+                            }
+                            <h3 class="fw-bold @textColorClass mb-0">$@netAmount.ToString("N2")</h3>
+                        </div>
+                        <div class="icon-shape bg-light-primary text-primary rounded p-3">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 mb-0 text-muted small">
+                        <span>Current balance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-normal mb-0">Total Transactions</h6>
+                            <h3 class="fw-bold text-dark mb-0">@Model.Count()</h3>
+                        </div>
+                        <div class="icon-shape bg-light-dark text-dark rounded p-3">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 mb-0 text-muted small">
+                        <span>All time</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Transaction History</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="transactionsTable" class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>@Html.DisplayNameFor(model => model.Wallet)</th>
+                            <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                            <th>@Html.DisplayNameFor(model => model.TransactionType)</th>
+                            <th>@Html.DisplayNameFor(model => model.Note)</th>
+                            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int index = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr class="transaction-row"
+                            data-type="@item.TransactionType"
+                            data-amount="@item.Amount"
+                            data-wallet="@item.Wallet.Id"
+                            data-date="@item.CreatedAt.ToString("yyyy-MM-dd")">
+                                <td>@index</td>
+                                <td>@Html.DisplayFor(modelItem => item.Wallet.Name)</td>
+                                <td class="fw-medium">$@item.Amount.ToString("N2")</td>
+                                <td>
+                                    <span class="badge @(item.TransactionType.ToString() == "Receive" ? "bg-success" : "bg-danger")">
+                                        @Html.DisplayFor(modelItem => item.TransactionType)
+                                    </span>
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.Note)</td>
+                                <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("Edit", new { id = item.Id })">
+                                                    <i class="fas fa-edit me-2 text-primary"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("Details", new { id = item.Id })">
+                                                    <i class="fas fa-info-circle me-2 text-info"></i> Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = item.Id })">
+                                                    <i class="fas fa-trash me-2"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <nav aria-label="Transactions pagination">
+                <ul class="pagination justify-content-end mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
-<!-- FontAwesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <a href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "receive" })" class="btn btn-success btn-circle">
+        <i class="fas fa-arrow-down"></i>
+    </a>
+    <a href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "send" })" class="btn btn-danger btn-circle">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+    <style>
+        /* Odoo-inspired styles */
+        :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --light-dark: #f1f1f1;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        }
+
+        body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+        }
+
+        .transaction-dashboard {
+        padding: 1.5rem;
+        }
+
+        .page-header h1 {
+        color: var(--primary-color);
+        font-weight: 500;
+        }
+
+        .card {
+        border: none;
+        border-radius: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .icon-shape {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        .bg-light-success {
+        background-color: var(--light-success);
+        }
+
+        .bg-light-danger {
+        background-color: var(--light-danger);
+        }
+
+        .bg-light-primary {
+        background-color: var(--light-primary);
+        }
+
+        .bg-light-dark {
+        background-color: var(--light-dark);
+        }
+
+        .text-success {
+        color: var(--success-color) !important;
+        }
+
+        .text-danger {
+        color: var(--danger-color) !important;
+        }
+
+        .text-primary {
+        color: var(--primary-color) !important;
+        }
+
+        .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        }
+
+        .table {
+        color: #212529;
+        }
+
+        .table thead th {
+        background-color: #f8f9fa;
+        color: var(--text-muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        border-top: none;
+        border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+        background-color: rgba(113, 75, 103, 0.05);
+        }
+
+        .dropdown-item i {
+        width: 1rem;
+        }
+
+        .badge {
+        padding: 0.4em 0.65em;
+        font-weight: 500;
+        }
+
+        .action-buttons {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 1000;
+        }
+
+        .btn-circle {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-circle i {
+        font-size: 1.25rem;
+        }
+
+        /* Pagination styling */
+        .page-link {
+        color: var(--primary-color);
+        border: 1px solid var(--border-color);
+        }
+
+        .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        }
+
+        /* Filter panel styling */
+        #filterPanel {
+        border-radius: 0.5rem;
+        }
+
+        .form-label {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        }
+
+        .form-control, .form-select {
+        border-color: var(--border-color);
+        padding: 0.5rem 0.75rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.25);
+        }
+
+        /* Responsive adjustments */
+        
+    Edit
+    (max-width: 768px) {
+    .transaction-dashboard
+
+        {
+            padding: 1rem;
+        }
+
+        .action-buttons {
+            bottom: 1rem;
+            right: 1rem;
+        }
+
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize date range picker
+            $('#dateRangePicker').daterangepicker({
+                opens: 'left',
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'MM/DD/YYYY'
+                }
+            });
+
+            $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            });
+
+            $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+            });
+
+            // Toggle filter panel
+            $('#filterToggle').click(function() {
+                $('#filterPanel').slideToggle(300);
+            });
+
+            // Apply filters
+            $('#applyFilters').click(function() {
+                filterTransactions();
+            });
+
+            // Reset filters
+            $('#resetFilters').click(function() {
+                $('#filterForm')[0].reset();
+                $('.transaction-row').show();
+                updateDashboardSummary();
+            });
+
+            // Filter transactions function
+            function filterTransactions() {
+                const dateRange = $('#dateRangePicker').val();
+                const transactionType = $('#transactionType').val();
+                const minAmount = $('#minAmount').val() ? parseFloat($('#minAmount').val()) : 0;
+                const maxAmount = $('#maxAmount').val() ? parseFloat($('#maxAmount').val()) : Infinity;
+                const walletId = $('#walletFilter').val();
+
+                let startDate, endDate;
+
+                if (dateRange) {
+                    const dates = dateRange.split(' - ');
+                    startDate = moment(dates[0], 'MM/DD/YYYY');
+                    endDate = moment(dates[1], 'MM/DD/YYYY').endOf('day');
+                }
+
+                $('.transaction-row').each(function() {
+                    const $row = $(this);
+                    const rowType = $row.data('type');
+                    const rowAmount = parseFloat($row.data('amount'));
+                    const rowWallet = $row.data('wallet').toString();
+                    const rowDate = moment($row.data('date'));
+
+                    let showRow = true;
+
+                    // Filter by date range
+                    if (dateRange && (rowDate < startDate || rowDate > endDate)) {
+                        showRow = false;
+                    }
+
+                    // Filter by transaction type
+                    if (transactionType && rowType !== transactionType) {
+                        showRow = false;
+                    }
+
+                    // Filter by amount range
+                    if (rowAmount < minAmount || rowAmount > maxAmount) {
+                        showRow = false;
+                    }
+
+                    // Filter by wallet
+                    if (walletId && rowWallet !== walletId) {
+                        showRow = false;
+                    }
+
+                    $row.toggle(showRow);
+                });
+
+                updateDashboardSummary();
+            }
+
+            // Update dashboard summary based on visible rows
+            function updateDashboardSummary() {
+                let totalCredit = 0;
+                let totalDebit = 0;
+                let totalTransactions = 0;
+
+                $('.transaction-row:visible').each(function() {
+                    const $row = $(this);
+                    const rowType = $row.data('type');
+                    const rowAmount = parseFloat($row.data('amount'));
+
+                    if (rowType === 'Receive') {
+                        totalCredit += rowAmount;
+                    } else if (rowType === 'Send') {
+                        totalDebit += rowAmount;
+                    }
+
+                    totalTransactions++;
+                });
+
+                const netAmount = totalCredit - totalDebit;
+                const netClass = netAmount >= 0 ? 'text-primary' : 'text-danger';
+
+                // Update the dashboard cards
+                $('.card:eq(0) h3').text('$' + totalCredit.toFixed(2));
+                $('.card:eq(0) .mt-3 span').text(
+                    $('.transaction-row:visible[data-type="Receive"]').length + ' transactions'
+                );
+
+                $('.card:eq(1) h3').text('$' + totalDebit.toFixed(2));
+                $('.card:eq(1) .mt-3 span').text(
+                    $('.transaction-row:visible[data-type="Send"]').length + ' transactions'
+                );
+
+                $('.card:eq(2) h3').removeClass('text-primary text-danger').addClass(netClass).text('$' + netAmount.toFixed(2));
+
+                $('.card:eq(3) h3').text(totalTransactions);
+            }
+
+            // Export to CSV
+            $('#exportCsv').click(function(e) {
+                e.preventDefault();
+
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "ID,Wallet,Amount,Type,Note,Date\n";
+
+                $('.transaction-row:visible').each(function() {
+                    const $row = $(this);
+                    const cells = $row.find('td');
+
+                    const id = $(cells[0]).text();
+                    const wallet = $(cells[1]).text();
+                    const amount = $(cells[2]).text().replace('$', '');
+                    const type = $(cells[3]).text().trim();
+                    const note = $(cells[4]).text();
+                    const date = $(cells[5]).text();
+
+                    csvContent += `${id},"${wallet}",${amount},"${type}","${note}","${date}"\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "transactions_export.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Print report
+            $('#printReport').click(function(e) {
+                e.preventDefault();
+                window.print();
+            });
+        });
+    </script>
+}

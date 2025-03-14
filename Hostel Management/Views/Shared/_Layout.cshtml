@@ -9,46 +9,44 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <div class="appbar d-flex align-items-center px-3" style="height: 45px; color: white;">
         <button class="toggle-btn btn btn-close text-white me-2" onclick="toggleSidebar()" style="border: none; background: transparent;">
             <i style="text-decoration:none;" class="fa-solid fa-bars"></i>
         </button>
-
         <h5 style="font-weight:bold;font-size:17px;" class="px-4">Transaction Portal</h5>
         <div class="ms-auto">
             <partial name="_LoginPartial.cshtml" />
         </div>
     </div>
 
-
-    
-<div class="main-container d-flex">
-        <div class="sidebar  " id="side_nav">
+    <div class="main-container d-flex">
+        <div class="sidebar" id="side_nav">
             <ul class="menu list-unstyled">
                 <li><a href="/Wallets" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-home me-2"></i> Dashboard</a></li>
-                <li><a href="/Currencies" class="d-flex align-items-center text-decoration-none text-black "><i class="fa-solid fa-dollar-sign me-2"></i> Currencies</a></li>
+                <li><a href="/Currencies" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-dollar-sign me-2"></i> Currencies</a></li>
                 <li><a href="/BankAccounts" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-vault me-2"></i> Accounts</a></li>
                 <li><a href="/UserWallets" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-boxes-stacked me-2"></i> User Wallets</a></li>
                 <li><a href="/Categories" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Categories</a></li>
                 <li><a href="/hostelRooms" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-bed me-2"></i> Hostel</a></li>
-                <li><a href="/Users" class="d-flex align-items-center text-decoration-none text-black "><i class="fa-solid fa-users me-2"></i> Users</a></li>
+                <li><a href="/Users" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Users</a></li>
                 <li><a href="/Settings" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-gear me-2"></i> Settings</a></li>
             </ul>
         </div>
-</div>
-    <div class="" style="margin-top:50px;height:100%;";>
+    </div>
+
+    <div style="margin-top:50px;height:100%;">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
     <script>
-                document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             const toggleButton = document.querySelector(".toggle-btn");
             const sidebar = document.querySelector(".sidebar");
 
@@ -63,8 +61,6 @@
                 }
             });
         });
-
-
     </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
