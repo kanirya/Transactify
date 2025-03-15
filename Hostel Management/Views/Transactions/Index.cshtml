@@ -5,133 +5,1023 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+        .page-title::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), #9a6b8c);
+            border-radius: 3px;
+        }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .filter-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), #9a6b8c);
+        }
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0;
+    }
+
+    .filter-toggle {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+    }
+
+        .filter-toggle:hover {
+            color: var(--primary-color);
+        }
+
+    .filter-body {
+        transition: all 0.3s ease;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+    }
+
+        .filter-body.show {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
+    .filter-form-group {
+        margin-bottom: 1rem;
+    }
+
+    .filter-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-input {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .filter-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.15);
+        }
+
+    .filter-select {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        background-color: white;
+    }
+
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.15);
+        }
+
+    .filter-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-filter-apply {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+        .btn-filter-apply:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+    .btn-filter-reset {
+        background-color: white;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+    }
+
+        .btn-filter-reset:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--light-primary);
+        color: var(--primary-color);
+        border-radius: 30px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-badge-close {
+        margin-left: 0.5rem;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(113, 75, 103, 0.2);
+        color: var(--primary-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .filter-badge-close:hover {
+            background-color: rgba(113, 75, 103, 0.4);
+        }
+
+    .active-filters {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .active-filters-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-right: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Summary Card */
+    .summary-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+        .summary-card:hover {
+            box-shadow: 0 8px 25px rgba(113, 75, 103, 0.15);
+        }
+
+    .summary-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #8a5d7e 100%);
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .summary-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+    .summary-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .summary-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .summary-body {
+        padding: 1.5rem;
+    }
+
+    .summary-stat {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1rem;
+    }
+
+    .icon-primary {
+        background-color: var(--light-primary);
+        color: var(--primary-color);
+    }
+
+    .icon-success {
+        background-color: var(--light-success);
+        color: var(--success-color);
+    }
+
+    .icon-danger {
+        background-color: var(--light-danger);
+        color: var(--danger-color);
+    }
+
+    .icon-info {
+        background-color: #e3f2fd;
+        color: var(--info-color);
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0;
+    }
+
+    .summary-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 1rem 0;
+    }
+
+    /* Transaction Cards */
+    .transaction-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+        .transaction-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+    .transaction-date {
+        padding: 0.75rem 1.25rem;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .transaction-body {
+        padding: 1.25rem;
+    }
+
+    .transaction-amount {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .amount-positive {
+        color: var(--success-color);
+    }
+
+    .amount-negative {
+        color: var(--danger-color);
+    }
+
+    .transaction-time {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .transaction-accounts {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+        position: relative;
+    }
+
+    .account-box {
+        flex: 1;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .account-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .account-number {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0;
+    }
+
+    .transfer-arrow {
+        width: 40px;
+        height: 40px;
+        background-color: var(--light-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        margin: 0 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+        .transfer-arrow::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -1rem;
+            right: -1rem;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+    .transaction-user {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.75rem;
+    }
+
+    .user-highlight {
+        font-weight: 600;
+        color: var(--success-color);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .action-button {
+        flex: 1;
+        max-width: 200px;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-add-cash {
+        background-color: var(--light-success);
+        color: var(--success-color);
+        border: none;
+    }
+
+        .btn-add-cash:hover {
+            background-color: var(--success-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+    .btn-send-money {
+        background-color: var(--light-primary);
+        color: var(--primary-color);
+        border: none;
+    }
+
+        .btn-send-money:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+    /* Dropdown Menu */
+    .transaction-menu {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+
+    .menu-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        border: none;
+        color: #6c757d;
+        transition: all 0.2s ease;
+    }
+
+        .menu-button:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+    /* Responsive Adjustments */
+    
+    
+    /* Animation */
+   
+    
+
+    .fade-in {
+        animation: fadeIn 0.3s ease forwards;
+    }
+
+    .transaction-list {
+        padding-bottom: 80px; /* Space for fixed bottom buttons */
+    }
+</style>
+
 <div class="container py-4">
-    <!-- Transaction Summary Card -->
-    <div class="transaction-summary-container p-4 shadow rounded-4 bg-white position-relative" style="max-width: 400px; min-height: 22vh; border-left: 6px solid #007bff;">
-        <h4 class="text-dark fw-bold text-center mb-3" style="font-size: 18px;">
-            <i class="fas fa-chart-line text-primary"></i> Transaction Overview
-        </h4>
-        <div class="d-flex flex-column gap-2">
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-coins text-success"></i> <strong>Total Amount:</strong>
-                <span class="text-dark fw-bold">@ViewBag.TotalAmount PKR</span>
-            </p>
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-coins text-success"></i> <strong>Send Amount:</strong>
-                <span class="text-dark fw-bold">@ViewBag.SendAmount PKR</span>
-            </p>
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-coins text-success"></i> <strong>Receive Amount:</strong>
-                <span class="text-dark fw-bold">@ViewBag.ReceiveAmount PKR</span>
-            </p>
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-file-invoice text-warning"></i> <strong>Transactions:</strong>
-                <span class="text-dark fw-bold">@ViewBag.TransactionsCount</span>
-            </p>
-            <hr class="my-2 text-muted" />
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-user-circle text-primary"></i> <strong>Primary Account Holder:</strong>
-                <span class="text-dark fw-bold">@ViewBag.ThisUser.Owner.Name</span>
-            </p>
-            <p class="mb-0 text-secondary" style="font-size: 15px;">
-                <i class="fas fa-user-check text-info"></i> <strong>Authorized Delegate:</strong>
-                <span class="text-dark fw-bold">@ViewBag.ThisUser.ConnectedUser.Name</span>
-            </p>
+    <h1 class="page-title">Transaction Dashboard</h1>
+
+    <!-- Filter Section -->
+    <div class="filter-section fade-in">
+        <div class="filter-header">
+            <h2 class="filter-title">
+                <i class="fas fa-filter me-2"></i> Filter Transactions
+            </h2>
+            <button type="button" class="filter-toggle" id="filterToggle">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="filter-body" id="filterBody">
+            <form id="filterForm">
+                <div class="row">
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="accountFilter">Account</label>
+                            <select class="form-select filter-select" id="accountFilter" name="account">
+                                <option value="">All Accounts</option>
+                                @foreach (var account in Model.Select(t => t.FromAccount).Distinct())
+                                {
+                                    <option value="@account.Id">@account.AccountName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="userFilter">User</label>
+                            <select class="form-select filter-select" id="userFilter" name="user">
+                                <option value="">All Users</option>
+                                @foreach (var user in Model.Select(t => t.User).Distinct())
+                                {
+                                    <option value="@user.Id">@user.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="currencyFilter">Currency</label>
+                            <select class="form-select filter-select" id="currencyFilter" name="currency">
+                                <option value="">All Currencies</option>
+                                @foreach (var currency in Model.Select(t => t.Currency).Distinct())
+                                {
+                                    <option value="@currency.Id">@currency.Code</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="dateFromFilter">Date From</label>
+                            <input type="date" class="form-control filter-input" id="dateFromFilter" name="dateFrom">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="dateToFilter">Date To</label>
+                            <input type="date" class="form-control filter-input" id="dateToFilter" name="dateTo">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="amountFilter">Min Amount</label>
+                            <input type="number" class="form-control filter-input" id="amountFilter" name="amount" placeholder="Enter minimum amount">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="transactionTypeFilter">Transaction Type</label>
+                            <select class="form-select filter-select" id="transactionTypeFilter" name="type">
+                                <option value="">All Types</option>
+                                <option value="received">Received</option>
+                                <option value="sent">Sent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 col-sm-6">
+                        <div class="filter-form-group">
+                            <label class="filter-label" for="searchFilter">Search</label>
+                            <input type="text" class="form-control filter-input" id="searchFilter" name="search" placeholder="Search by account name, number or user...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="button" class="btn filter-btn btn-filter-reset" id="resetFilters">
+                        <i class="fas fa-undo me-2"></i> Reset
+                    </button>
+                    <button type="submit" class="btn filter-btn btn-filter-apply">
+                        <i class="fas fa-search me-2"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="active-filters" id="activeFilters" style="display: none;">
+            <span class="active-filters-label">Active Filters:</span>
+            <div id="filterBadges"></div>
         </div>
     </div>
 
-    <hr />
-    <h5 class="fw-bold text-dark">Transactions</h5>
-    <div class="row g-3">
-        @foreach (var item in Model)
-        {
-            <div class="col-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4 d-flex justify-content-center p-2">
-                <div class="position-relative" style="width: 100%; max-width: 450px;">
-                    <!-- Dropdown Positioned Absolutely in the Card -->
-                    <div class="justify-content-between d-flex px-3">
+    <div class="row">
+        <!-- Transaction Summary Card -->
+        <div class="col-lg-5 col-xl-4 mb-4">
+            <div class="summary-card fade-in">
+                <div class="summary-header">
+                    <h2 class="summary-title">
+                        <i class="fas fa-chart-line me-2"></i> Transaction Overview
+                    </h2>
+                    <p class="summary-subtitle">Account summary and statistics</p>
+                </div>
 
-
-                        <h5 class="" style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">
-                            @item.Timestamp.ToString("dd MMMMM yyyy")
-                        </h5>
-                       
+                <div class="summary-body">
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-primary">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Amount</p>
+                            <p class="stat-value" id="totalAmount">@ViewBag.TotalAmount PKR</p>
+                        </div>
                     </div>
-                    <div class="transaction-container p-3">
 
-
-                        <div class="d-flex justify-content-between">
-                            <h5 style="font-size:14px;">
-                                <strong>@item.Currency.Code</strong>
-                                @if (item.User.Id == ViewBag.CurrentUserId)
-                                {
-                                    @("+" + item.Amount) <!-- Show as negative if UserId matches -->
-                                }
-                                else
-                                {
-                                    @("-" + item.Amount) <!-- Show as positive otherwise -->
-                                }
-                            </h5>
-
-
-
-                            <div class="d-flex">
-                                <h5 class="px-2" style="font-size:15px;font-weight:bold; color:#222222;opacity:.8;">@item.Timestamp.ToString("h:mm tt")</h5>
-                                <div class="dropdown">
-                                    <button class="btn btn-light btn-sm border-0" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
-                                        <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
-                                        <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
-                                        <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
-                                    </ul>
-                                </div>
-                                </div>
-                           
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-success">
+                            <i class="fas fa-arrow-down"></i>
                         </div>
-                        <hr />
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="mb-0 text-secondary">From: <span class="fw-bold">@item.FromAccount.AccountName</span></p>
-                                <p class="mb-0 text-secondary" style="font-size: 14px;">@item.FromAccount.AccountNumber</p>
-                            </div>
-                            <i class="fa-solid fa-arrow-right moving-arrow fa-2x"></i>
-                            <div class="px-2">
-                                <p class="mb-0 text-secondary">To: <span class="fw-bold">@item.ToAccount.AccountName</span></p>
-                                <p class="mb-0 text-secondary" style="font-size: 14px;">@item.ToAccount.AccountNumber</p>
-                            </div>
-                           
+                        <div class="stat-content">
+                            <p class="stat-label">Received Amount</p>
+                            <p class="stat-value" id="receiveAmount">@ViewBag.ReceiveAmount PKR</p>
                         </div>
-                        <h5 style="font-size:14px;">
-                            By
-                                @if (@item.User.Id== ViewBag.CurrentUserId){
-                                <strong style="color:green"> You</strong>
-                                }
-                                else{
-                                <strong style="color:green"> @item.User.Name</strong>
-                                }
-                               
-                        </h5>
+                    </div>
+
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-danger">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Sent Amount</p>
+                            <p class="stat-value" id="sendAmount">@ViewBag.SendAmount PKR</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-info">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Total Transactions</p>
+                            <p class="stat-value" id="transactionCount">@ViewBag.TransactionsCount</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-primary">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Primary Account Holder</p>
+                            <p class="stat-value">@ViewBag.ThisUser.Owner.Name</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-stat">
+                        <div class="stat-icon icon-info">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Authorized Delegate</p>
+                            <p class="stat-value">@ViewBag.ThisUser.ConnectedUser.Name</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        }
+        </div>
+
+        <!-- Transaction List -->
+        <div class="col-lg-7 col-xl-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="page-title mb-0">Recent Transactions</h2>
+                <div class="transaction-count">
+                    <span class="badge bg-light-primary text-primary px-3 py-2 rounded-pill">
+                        <i class="fas fa-list me-1"></i> <span id="visibleTransactionCount">@Model.Count()</span> Transactions
+                    </span>
+                </div>
+            </div>
+
+            <div class="transaction-list" id="transactionList">
+                @foreach (var item in Model)
+                {
+                    <div class="transaction-card fade-in"
+                         data-account-from="@item.FromAccount.Id"
+                         data-account-to="@item.ToAccount.Id"
+                         data-user="@item.User.Id"
+                         data-currency="@item.Currency.Id"
+                         data-amount="@item.Amount"
+                         data-date="@item.Timestamp.ToString("yyyy-MM-dd")"
+                         data-type="@(item.User.Id == ViewBag.CurrentUserId ? "received" : "sent")"
+                         data-search="@(item.FromAccount.AccountName.ToLower()) @(item.FromAccount.AccountNumber.ToLower()) @(item.ToAccount.AccountName.ToLower()) @(item.ToAccount.AccountNumber.ToLower()) @(item.User.Name.ToLower())">
+                        <div class="transaction-date">
+                            <i class="fas fa-calendar-day me-2"></i> @item.Timestamp.ToString("dd MMMM yyyy")
+                        </div>
+
+                        <div class="transaction-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="transaction-amount @(item.User.Id == ViewBag.CurrentUserId ? "amount-positive" : "amount-negative")">
+                                    <strong>@item.Currency.Code</strong>
+                                    @if (item.User.Id == ViewBag.CurrentUserId)
+                                    {
+                                        <span>+ @item.Amount</span>
+                                    }
+                                    else
+                                    {
+                                        <span>- @item.Amount</span>
+                                    }
+                                </div>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="transaction-time me-3">
+                                        <i class="fas fa-clock me-1"></i> @item.Timestamp.ToString("h:mm tt")
+                                    </div>
+
+                                    <div class="dropdown">
+                                        <button class="menu-button" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu-@item.Id">
+                                            <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-edit me-2"></i> Edit</a></li>
+                                            <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle me-2"></i> Details</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash-alt me-2"></i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="transaction-accounts">
+                                <div class="account-box">
+                                    <p class="account-name">From: @item.FromAccount.AccountName</p>
+                                    <p class="account-number">@item.FromAccount.AccountNumber</p>
+                                </div>
+
+                                <div class="transfer-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+
+                                <div class="account-box">
+                                    <p class="account-name">To: @item.ToAccount.AccountName</p>
+                                    <p class="account-number">@item.ToAccount.AccountNumber</p>
+                                </div>
+                            </div>
+
+                            <div class="transaction-user">
+                                <i class="fas fa-user me-1"></i> By
+                                @if (item.User.Id == ViewBag.CurrentUserId)
+                                {
+                                    <span class="user-highlight">You</span>
+                                }
+                                else
+                                {
+                                    <span class="user-highlight">@item.User.Name</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div id="noTransactionsMessage" class="text-center py-5 bg-white rounded-3 shadow-sm" style="display: none;">
+                    <i class="fas fa-receipt fa-3x mb-3 text-muted"></i>
+                    <h5 class="text-muted">No transactions found</h5>
+                    <p class="text-muted">Try adjusting your filter criteria</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row" style="  position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;">
-    <div class="col-6 col-sm-4 col-md-3">
-        <a style="text-decoration:none;" asp-action="Create" asp-route-id="@ViewBag.id">
-            <div class="create-tran-btn">Add Cash</div>
-        </a>
-    </div>
-    <div class="col-6 col-sm-4 col-md-3">
-        <a style="text-decoration:none;" asp-action="Create" asp-route-id="@ViewBag.id">
-            <div class="create-tran-btn">Send Money</div>
-        </a>
-    </div>
+<!-- Fixed Action Buttons -->
+<div class="action-buttons">
+    <a asp-action="Create" asp-route-id="@ViewBag.id" class="action-button btn-add-cash" style="text-decoration: none;">
+        <i class="fas fa-plus-circle"></i> Add Cash
+    </a>
+    <a asp-action="Create" asp-route-id="@ViewBag.id" class="action-button btn-send-money" style="text-decoration: none;">
+        <i class="fas fa-paper-plane"></i> Send Money
+    </a>
 </div>
+
+<!-- Filter Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Filter toggle functionality
+        const filterToggle = document.getElementById('filterToggle');
+        const filterBody = document.getElementById('filterBody');
+        const activeFilters = document.getElementById('activeFilters');
+        const filterBadges = document.getElementById('filterBadges');
+        const filterForm = document.getElementById('filterForm');
+        const resetFilters = document.getElementById('resetFilters');
+        const transactionCards = document.querySelectorAll('.transaction-card');
+        const noTransactionsMessage = document.getElementById('noTransactionsMessage');
+        const visibleTransactionCount = document.getElementById('visibleTransactionCount');
+        const totalAmount = document.getElementById('totalAmount');
+        const receiveAmount = document.getElementById('receiveAmount');
+        const sendAmount = document.getElementById('sendAmount');
+        const transactionCount = document.getElementById('transactionCount');
+
+        // Toggle filter section
+        filterToggle.addEventListener('click', function() {
+            filterBody.classList.toggle('show');
+            this.querySelector('i').classList.toggle('fa-chevron-down');
+            this.querySelector('i').classList.toggle('fa-chevron-up');
+        });
+
+        // Apply filters
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters();
+        });
+
+        // Reset filters
+        resetFilters.addEventListener('click', function() {
+            filterForm.reset();
+            applyFilters();
+        });
+
+        function applyFilters() {
+            const formData = new FormData(filterForm);
+            const filters = {};
+            let activeFilterCount = 0;
+
+            // Get filter values
+            for (const [key, value] of formData.entries()) {
+                if (value) {
+                    filters[key] = value.toLowerCase();
+                    activeFilterCount++;
+                }
+            }
+
+            // Update filter badges
+            filterBadges.innerHTML = '';
+            for (const key in filters) {
+                let label = key.charAt(0).toUpperCase() + key.slice(1);
+                let value = filters[key];
+
+                // Format date values
+                if (key === 'dateFrom' || key === 'dateTo') {
+                    const date = new Date(value);
+                    value = date.toLocaleDateString();
+                }
+
+                // Get display text for select options
+                if (key === 'account' || key === 'user' || key === 'currency') {
+                    const select = document.getElementById(key + 'Filter');
+                    const option = select.options[select.selectedIndex];
+                    value = option.text;
+                }
+
+                if (key === 'type') {
+                    value = value.charAt(0).toUpperCase() + value.slice(1);
+                }
+
+                const badge = document.createElement('div');
+                badge.className = 'filter-badge';
+                badge.innerHTML = `${label}: ${value} <span class="filter-badge-close" data-filter="${key}">×</span>`;
+                filterBadges.appendChild(badge);
+            }
+
+            // Show/hide active filters section
+            activeFilters.style.display = activeFilterCount > 0 ? 'flex' : 'none';
+
+            // Add click event to remove filter badges
+            document.querySelectorAll('.filter-badge-close').forEach(badge => {
+                badge.addEventListener('click', function() {
+                    const filterKey = this.getAttribute('data-filter');
+                    const filterInput = document.querySelector(`[name="${filterKey}"]`);
+                    filterInput.value = '';
+                    applyFilters();
+                });
+            });
+
+            // Filter transactions
+            let visibleCount = 0;
+            let totalAmountValue = 0;
+            let receiveAmountValue = 0;
+            let sendAmountValue = 0;
+
+            transactionCards.forEach(card => {
+                const accountFrom = card.getAttribute('data-account-from');
+                const accountTo = card.getAttribute('data-account-to');
+                const user = card.getAttribute('data-user');
+                const currency = card.getAttribute('data-currency');
+                const amount = parseFloat(card.getAttribute('data-amount'));
+                const date = card.getAttribute('data-date');
+                const type = card.getAttribute('data-type');
+                const searchText = card.getAttribute('data-search');
+
+                let isVisible = true;
+
+                // Apply each filter
+                if (filters.account && accountFrom !== filters.account && accountTo !== filters.account) {
+                    isVisible = false;
+                }
+
+                if (filters.user && user !== filters.user) {
+                    isVisible = false;
+                }
+
+                if (filters.currency && currency !== filters.currency) {
+                    isVisible = false;
+                }
+
+                if (filters.dateFrom && date < filters.dateFrom) {
+                    isVisible = false;
+                }
+
+                if (filters.dateTo && date > filters.dateTo) {
+                    isVisible = false;
+                }
+
+                if (filters.amount && amount < parseFloat(filters.amount)) {
+                    isVisible = false;
+                }
+
+                if (filters.type && type !== filters.type) {
+                    isVisible = false;
+                }
+
+                if (filters.search && !searchText.includes(filters.search.toLowerCase())) {
+                    isVisible = false;
+                }
+
+                // Show/hide card
+                if (isVisible) {
+                    card.style.display = 'block';
+                    visibleCount++;
+
+                    // Update summary values
+                    totalAmountValue += amount;
+                    if (type === 'received') {
+                        receiveAmountValue += amount;
+                    } else {
+                        sendAmountValue += amount;
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update transaction count
+            visibleTransactionCount.textContent = visibleCount;
+
+            // Show/hide no transactions message
+            noTransactionsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+
+            // Update summary card if filters are applied
+            if (activeFilterCount > 0) {
+                totalAmount.textContent = totalAmountValue.toFixed(2) + ' PKR';
+                receiveAmount.textContent = receiveAmountValue.toFixed(2) + ' PKR';
+                sendAmount.textContent = sendAmountValue.toFixed(2) + ' PKR';
+                transactionCount.textContent = visibleCount;
+            }
+        }
+
+        // Initialize with filter section closed
+        setTimeout(() => {
+            filterBody.classList.add('show');
+            filterToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            filterToggle.querySelector('i').classList.toggle('fa-chevron-up');
+        }, 500);
+    });
+</script>

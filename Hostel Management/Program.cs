@@ -49,7 +49,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Wallets}/{action=Index}/{id?}");
+    pattern: "{controller=UserWallets}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

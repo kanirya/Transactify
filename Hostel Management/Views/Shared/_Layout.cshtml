@@ -5,61 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Muhammad Danish" />
     <meta name="description" content="This App is for hostel management system." />
-    <title>@ViewData["Title"] - Hostel_Management</title>
+    <title>@ViewData["Title"] - Hostel Management</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hostel_Management.styles.css" asp-append-version="true" />
+
+    <style>
+     
+    </style>
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="appbar d-flex align-items-center px-3" style="height: 45px; color: white;">
-        <button class="toggle-btn btn btn-close text-white me-2" onclick="toggleSidebar()" style="border: none; background: transparent;">
-            <i style="text-decoration:none;" class="fa-solid fa-bars"></i>
+    <!-- Header -->
+    <header class="app-header">
+        <button class="toggle-btn" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
         </button>
-        <h5 style="font-weight:bold;font-size:17px;" class="px-4">Transaction Portal</h5>
-        <div class="ms-auto">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+            <span>Transaction Portal</span>
+        </div>
+
+        <div class="ms-auto user-menu">
             <partial name="_LoginPartial.cshtml" />
         </div>
-    </div>
+    </header>
 
-    <div class="main-container d-flex">
-        <div class="sidebar" id="side_nav">
-            <ul class="menu list-unstyled">
-                <li><a href="/Wallets" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-home me-2"></i> Dashboard</a></li>
-                <li><a href="/Currencies" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-dollar-sign me-2"></i> Currencies</a></li>
-                <li><a href="/BankAccounts" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-vault me-2"></i> Accounts</a></li>
-                <li><a href="/UserWallets" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-boxes-stacked me-2"></i> User Wallets</a></li>
-                <li><a href="/Categories" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Categories</a></li>
-                <li><a href="/hostelRooms" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-bed me-2"></i> Hostel</a></li>
-                <li><a href="/Users" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-users me-2"></i> Users</a></li>
-                <li><a href="/Settings" class="d-flex align-items-center text-decoration-none text-black"><i class="fa-solid fa-gear me-2"></i> Settings</a></li>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="menu">
+            <div class="menu-category">Main Navigation</div>
+            <ul class="list-unstyled">
+                <li>
+                    <a href="/UserWallets" class="menu-item" id="dashboard-link">
+                        <i class="fa-solid fa-home"></i>
+                        <span class="menu-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Currencies" class="menu-item" id="currencies-link">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                        <span class="menu-text">Currencies</span>
+                    </a>
+                </li>
+               
+               
+            </ul>
+
+            <div class="menu-category">Management</div>
+            <ul class="list-unstyled">
+                <li>
+                    <a href="/Wallets" class="menu-item" id="categories-link">
+                        <i class="fa-solid fa-tags"></i>
+                        <span class="menu-text">Wallets</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/BankAccounts" class="menu-item" id="accounts-link">
+                        <i class="fa-solid fa-landmark"></i>
+                        <span class="menu-text">Accounts</span>
+                    </a>
+                </li>
+              
+            </ul>
+
+            <div class="menu-category">System</div>
+            <ul class="list-unstyled">
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index" class="menu-item" id="settings-link">
+                        <i class="fa-solid fa-gear"></i>
+                        <span class="menu-text">Settings</span>
+                    </a>
+                </li>
             </ul>
         </div>
-    </div>
+    </aside>
 
-    <div style="margin-top:50px;height:100%;">
-        <main role="main" class="pb-3">
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="content">
             @RenderBody()
-        </main>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const toggleButton = document.querySelector(".toggle-btn");
-            const sidebar = document.querySelector(".sidebar");
+            // Sidebar toggle functionality
+            const sidebarToggle = document.getElementById("sidebarToggle");
+            const sidebar = document.getElementById("sidebar");
+            const body = document.body;
 
-            toggleButton.addEventListener("click", function () {
-                sidebar.classList.toggle("active");
+            // Set active menu item based on current URL
+            const currentUrl = window.location.pathname.toLowerCase();
+            const menuItems = document.querySelectorAll(".menu-item");
+
+            menuItems.forEach(item => {
+                const href = item.getAttribute("href").toLowerCase();
+                if (currentUrl.includes(href) && href !== "/") {
+                    item.classList.add("active");
+                }
             });
 
-            // Close sidebar when clicking outside
+            // Toggle sidebar on mobile
+            sidebarToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("active");
+
+                // For desktop view
+                if (window.innerWidth >= 992) {
+                    body.classList.toggle("sidebar-collapsed");
+                }
+            });
+
+            // Close sidebar when clicking outside on mobile
             document.addEventListener("click", function (event) {
-                if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                if (window.innerWidth < 992 &&
+                    !sidebar.contains(event.target) &&
+                    !sidebarToggle.contains(event.target)) {
                     sidebar.classList.remove("active");
                 }
             });
+
+            // Handle window resize
+            window.addEventListener("resize", function() {
+                if (window.innerWidth >= 992) {
+                    sidebar.classList.add("active");
+                } else {
+                    sidebar.classList.remove("active");
+                    body.classList.remove("sidebar-collapsed");
+                }
+            });
+
+            // Initialize sidebar state on page load
+            if (window.innerWidth >= 992) {
+                sidebar.classList.add("active");
+            }
         });
     </script>
 

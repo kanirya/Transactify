@@ -5,49 +5,756 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-4">
-    <h4 class="fw-bold text-dark text-center mb-3">
-        <i class="fas fa-university text-primary"></i> Bank Accounts
-    </h4>
-    <div class="row g-3">
-        @foreach (var item in Model)
-        {
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card shadow-lg border-0 rounded-3 bg-light position-relative">
-                    <div class="card-body p-3 text-center">
-                        <h5 class="fw-bold text-dark">
-                            <i class="fas fa-user text-secondary"></i> @item.AccountName
-                        </h5>
-                        <p class="text-muted" style="font-size: 14px;">
-                            <i class="fas fa-hashtag text-primary"></i> @item.AccountNumber
-                        </p>
-                        <p class="fw-bold text-success" style="font-size: 16px;">
-                            <i class="fas fa-dollar-sign"></i> @item.Balance
-                        </p>
-                        <p class="text-muted" style="font-size: 14px;">
-                            <i class="fas fa-money-bill"></i> @item.Currency.Name
-                        </p>
-                        <hr />
+<div class="bank-accounts-dashboard py-4">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1 fw-bold text-primary">Bank Accounts</h1>
+                <p class="text-muted mb-0">Manage your banking information</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Add Account
+            </a>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="filter-section card border-0 shadow-sm mb-4 fade-in">
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" id="accountSearch" placeholder="Search accounts..." autocomplete="off">
+                            <button class="btn btn-outline-secondary border-start-0 bg-white d-none" type="button" id="clearSearch">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="dropdown position-absolute top-0 end-0 m-2">
-                        <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i> Edit</a></li>
-                            <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i> Details</a></li>
-                            <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i> Delete</a></li>
-                        </ul>
+                    <div class="col-md-3">
+                        <select class="form-select" id="currencyFilter">
+                            <option value="">All Currencies</option>
+                            @foreach (var currency in Model.Select(a => a.Currency).Distinct())
+                            {
+                                <option value="@currency.Name">@currency.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="sortOption">
+                            <option value="name">Sort by Name</option>
+                            <option value="number">Sort by Account Number</option>
+                            <option value="balance-high">Balance: High to Low</option>
+                            <option value="balance-low">Balance: Low to High</option>
+                        </select>
                     </div>
                 </div>
             </div>
-        }
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="summary-card card border-0 shadow-sm h-100 fade-in">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon bg-primary-subtle rounded-circle me-3">
+                                <i class="fas fa-university text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Total Accounts</h6>
+                                <h3 class="fw-bold mb-0" id="totalAccounts">@Model.Count()</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card card border-0 shadow-sm h-100 fade-in">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon bg-success-subtle rounded-circle me-3">
+                                <i class="fas fa-dollar-sign text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Total Balance</h6>
+                                <h3 class="fw-bold mb-0" id="totalBalance">@Model.Sum(a => a.Balance).ToString("N2")</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="summary-card card border-0 shadow-sm h-100 fade-in">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="summary-icon bg-info-subtle rounded-circle me-3">
+                                <i class="fas fa-money-bill-wave text-info"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Currencies</h6>
+                                <h3 class="fw-bold mb-0" id="totalCurrencies">@Model.Select(a => a.Currency.Name).Distinct().Count()</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="results-info">
+                <span class="badge bg-light-primary text-primary px-3 py-2 rounded-pill">
+                    <i class="fas fa-university me-1"></i> <span id="accountCount">@Model.Count()</span> Accounts
+                </span>
+            </div>
+            <div class="view-options">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary active" id="gridView">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="listView">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Cards Grid View -->
+        <div class="row g-4" id="accountsGrid">
+            @if (Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4 col-xl-3 account-item fade-in"
+                         data-name="@item.AccountName.ToLower()"
+                         data-number="@item.AccountNumber.ToLower()"
+                         data-currency="@item.Currency.Name"
+                         data-balance="@item.Balance">
+                        <div class="account-card card border-0 shadow-sm h-100">
+                            <div class="card-body p-0">
+                                <!-- Card Header with Bank Logo -->
+                                <div class="account-card-header p-3 border-bottom position-relative">
+                                    <div class="bank-logo-bg"></div>
+                                    <div class="d-flex justify-content-between align-items-center position-relative">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bank-logo bg-primary-subtle rounded-circle me-2">
+                                                <i class="fas fa-university text-primary"></i>
+                                            </div>
+                                            <h3 class="card-title h6 fw-bold mb-0 text-truncate">@item.AccountName</h3>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-icon" type="button" id="dropdownMenu-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-vertical text-muted"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="dropdownMenu-@item.Id">
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center" asp-action="Edit" asp-route-id="@item.Id">
+                                                        <i class="fas fa-edit me-2 text-primary"></i> Edit
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center" asp-action="Details" asp-route-id="@item.Id">
+                                                        <i class="fas fa-info-circle me-2 text-info"></i> Details
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center text-danger" asp-action="Delete" asp-route-id="@item.Id">
+                                                        <i class="fas fa-trash-alt me-2"></i> Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="account-card-content p-3">
+                                    <div class="account-number mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="account-number-label text-muted small me-2">Account Number</div>
+                                            <div class="account-number-dots flex-grow-1 text-end">•••• •••• @item.AccountNumber.Substring(Math.Max(0, item.AccountNumber.Length - 4))</div>
+                                        </div>
+                                        <div class="account-number-full text-dark fw-medium">@item.AccountNumber</div>
+                                    </div>
+
+                                    <div class="account-balance mb-3">
+                                        <div class="text-muted small mb-1">Available Balance</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <h4 class="fw-bold text-success mb-0">@item.Balance.ToString("N2")</h4>
+                                            <span class="ms-2 text-muted small">@item.Currency.Name</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="account-meta d-flex justify-content-between">
+                                        <div class="badge bg-light-primary text-primary">
+                                            <i class="fas fa-money-bill-wave me-1"></i> @item.Currency.Name
+                                        </div>
+                                        <div class="badge bg-light-success text-success">
+                                            Active
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="account-card-footer d-flex border-top">
+                                    <a href="#" class="flex-grow-1 btn btn-light border-end rounded-0 py-2">
+                                        <i class="fas fa-exchange-alt text-primary me-1"></i> Transfer
+                                    </a>
+                                    <a href="#" class="flex-grow-1 btn btn-light rounded-0 py-2">
+                                        <i class="fas fa-file-invoice text-info me-1"></i> Statement
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div id="noAccountsMessage" class="col-12" style="display: none;">
+                <div class="empty-state card border-0 shadow-sm text-center p-5">
+                    <div class="empty-state-icon mb-3">
+                        <i class="fas fa-search text-muted fa-3x"></i>
+                    </div>
+                    <h3 class="h5 mb-2">No Matching Accounts</h3>
+                    <p class="text-muted mb-3">Try adjusting your search criteria</p>
+                    <button type="button" class="btn btn-outline-primary" id="clearFilters">
+                        <i class="fas fa-times me-2"></i>Clear All Filters
+                    </button>
+                </div>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="col-12">
+                    <div class="empty-state card border-0 shadow-sm text-center p-5">
+                        <div class="empty-state-icon mb-3">
+                            <i class="fas fa-university text-muted fa-3x"></i>
+                        </div>
+                        <h3 class="h5 mb-2">No Bank Accounts Found</h3>
+                        <p class="text-muted mb-3">You haven't added any bank accounts yet.</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Add Your First Account
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- List View (Hidden by Default) -->
+        <div class="account-list card border-0 shadow-sm" id="accountsList" style="display: none;">
+            <div class="list-group list-group-flush">
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <div class="list-group-item account-item p-0"
+                             data-name="@item.AccountName.ToLower()"
+                             data-number="@item.AccountNumber.ToLower()"
+                             data-currency="@item.Currency.Name"
+                             data-balance="@item.Balance">
+                            <div class="d-flex align-items-center p-3">
+                                <div class="bank-logo bg-primary-subtle rounded-circle me-3">
+                                    <i class="fas fa-university text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 me-3">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-1 fw-bold">@item.AccountName</h5>
+                                        <span class="fw-bold text-success">@item.Balance.ToString("N2") @item.Currency.Name</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="text-muted me-3">@item.AccountNumber</span>
+                                        <span class="badge bg-primary-subtle text-primary me-2">
+                                            <i class="fas fa-money-bill-wave me-1"></i> @item.Currency.Name
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <a href="#" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-exchange-alt me-1"></i> Transfer
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-icon" type="button" id="listDropdown-@item.Id" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-vertical text-muted"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="listDropdown-@item.Id">
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center" asp-action="Edit" asp-route-id="@item.Id">
+                                                    <i class="fas fa-edit me-2 text-primary"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center" asp-action="Details" asp-route-id="@item.Id">
+                                                    <i class="fas fa-info-circle me-2 text-info"></i> Details
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item d-flex align-items-center text-danger" asp-action="Delete" asp-route-id="@item.Id">
+                                                    <i class="fas fa-trash-alt me-2"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div id="noAccountsListMessage" class="p-5 text-center" style="display: none;">
+                <div class="empty-state-icon mb-3">
+                    <i class="fas fa-search text-muted fa-3x"></i>
+                </div>
+                <h3 class="h5 mb-2">No Matching Accounts</h3>
+                <p class="text-muted mb-3">Try adjusting your search criteria</p>
+                <button type="button" class="btn btn-outline-primary" id="clearListFilters">
+                    <i class="fas fa-times me-2"></i>Clear All Filters
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Add Account Button -->
-<div class="text-center my-4">
-    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2">
-        <i class="fas fa-plus-circle"></i> Add Account
-    </a>
-</div>
+<!-- Scripts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Search and filter functionality
+        const searchInput = document.getElementById('accountSearch');
+        const clearSearch = document.getElementById('clearSearch');
+        const currencyFilter = document.getElementById('currencyFilter');
+        const sortOption = document.getElementById('sortOption');
+        const accountItems = document.querySelectorAll('.account-item');
+        const noAccountsMessage = document.getElementById('noAccountsMessage');
+        const noAccountsListMessage = document.getElementById('noAccountsListMessage');
+        const accountCount = document.getElementById('accountCount');
+        const clearFilters = document.getElementById('clearFilters');
+        const clearListFilters = document.getElementById('clearListFilters');
+        const accountsGrid = document.getElementById('accountsGrid');
+        const accountsList = document.getElementById('accountsList');
+
+        // View toggle functionality
+        const gridView = document.getElementById('gridView');
+        const listView = document.getElementById('listView');
+
+        // Account number display
+        document.querySelectorAll('.account-number').forEach(function(el) {
+            el.addEventListener('click', function() {
+                this.classList.toggle('show-full');
+            });
+        });
+
+        // Toggle view (grid/list)
+        gridView.addEventListener('click', function() {
+            gridView.classList.add('active');
+            listView.classList.remove('active');
+            accountsGrid.style.display = 'flex';
+            accountsList.style.display = 'none';
+        });
+
+        listView.addEventListener('click', function() {
+            listView.classList.add('active');
+            gridView.classList.remove('active');
+            accountsList.style.display = 'block';
+            accountsGrid.style.display = 'none';
+        });
+
+        // Live search as user types
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            applyFilters();
+
+            // Show/hide clear button
+            if (searchTerm.length > 0) {
+                clearSearch.classList.remove('d-none');
+            } else {
+                clearSearch.classList.add('d-none');
+            }
+        });
+
+        // Currency filter change
+        currencyFilter.addEventListener('change', function() {
+            applyFilters();
+        });
+
+        // Sort option change
+        sortOption.addEventListener('change', function() {
+            applyFilters();
+        });
+
+        // Clear search button
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            applyFilters();
+            this.classList.add('d-none');
+            searchInput.focus();
+        });
+
+        // Clear filters from empty state
+        clearFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            currencyFilter.value = '';
+            sortOption.value = 'name';
+            applyFilters();
+            clearSearch.classList.add('d-none');
+        });
+
+        clearListFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            currencyFilter.value = '';
+            sortOption.value = 'name';
+            applyFilters();
+            clearSearch.classList.add('d-none');
+        });
+
+        // Apply filters function
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const currency = currencyFilter.value;
+            const sort = sortOption.value;
+
+            let visibleItems = [];
+
+            // First filter the items
+            accountItems.forEach(item => {
+                const itemName = item.getAttribute('data-name');
+                const itemNumber = item.getAttribute('data-number');
+                const itemCurrency = item.getAttribute('data-currency');
+
+                let isVisible = true;
+
+                if (searchTerm && !itemName.includes(searchTerm) && !itemNumber.includes(searchTerm)) {
+                    isVisible = false;
+                }
+
+                if (currency && itemCurrency !== currency) {
+                    isVisible = false;
+                }
+
+                // Show/hide item
+                if (isVisible) {
+                    item.style.display = '';
+                    visibleItems.push(item);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Then sort the visible items
+            if (visibleItems.length > 0) {
+                // Convert NodeList to Array for sorting
+                const sortedItems = Array.from(visibleItems);
+
+                // Sort based on selected option
+                sortedItems.sort((a, b) => {
+                    if (sort === 'name') {
+                        return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                    } else if (sort === 'number') {
+                        return a.getAttribute('data-number').localeCompare(b.getAttribute('data-number'));
+                    } else if (sort === 'balance-high') {
+                        return parseFloat(b.getAttribute('data-balance')) - parseFloat(a.getAttribute('data-balance'));
+                    } else if (sort === 'balance-low') {
+                        return parseFloat(a.getAttribute('data-balance')) - parseFloat(b.getAttribute('data-balance'));
+                    }
+                    return 0;
+                });
+
+                // Reorder the items in the DOM
+                const gridParent = document.getElementById('accountsGrid');
+                const listParent = document.getElementById('accountsList').querySelector('.list-group');
+
+                sortedItems.forEach(item => {
+                    if (item.parentElement === gridParent) {
+                        gridParent.appendChild(item);
+                    } else if (item.parentElement === listParent) {
+                        listParent.appendChild(item);
+                    }
+                });
+            }
+
+            // Update account count
+            accountCount.textContent = visibleItems.length;
+
+            // Show/hide no accounts message
+            noAccountsMessage.style.display = visibleItems.length === 0 ? 'block' : 'none';
+            noAccountsListMessage.style.display = visibleItems.length === 0 ? 'block' : 'none';
+        }
+
+        // Add highlight to search box on focus
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.parentElement.classList.add('search-focused');
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.parentElement.classList.remove('search-focused');
+        });
+
+        // Initialize sorting
+        applyFilters();
+    });
+</script>
+
+<style>
+    /* Bank accounts dashboard styling */
+    :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --light-info: #e3f2fd;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    body {
+        font-family: 'Inter', 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    /* Page header */
+    .page-header h1 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Card styling */
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .account-card {
+        height: 100%;
+    }
+
+        .account-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+        }
+
+    /* Bank logo styling */
+    .bank-logo {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bank-logo-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(113, 75, 103, 0.05) 0%, rgba(255, 255, 255, 0) 60%);
+        z-index: 0;
+    }
+
+    /* Button styling */
+    .btn {
+        font-weight: 500;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+        .btn-icon:hover {
+            background-color: #f0f0f0;
+        }
+
+    .account-card-footer .btn {
+        transition: background-color 0.2s;
+    }
+
+        .account-card-footer .btn:hover {
+            background-color: #f0f0f0;
+        }
+
+    /* Badge styling */
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        border-radius: 0.5rem;
+    }
+
+    .bg-primary-subtle {
+        background-color: var(--light-primary);
+    }
+
+    .bg-success-subtle {
+        background-color: var(--light-success);
+    }
+
+    .bg-danger-subtle {
+        background-color: var(--light-danger);
+    }
+
+    .bg-info-subtle {
+        background-color: var(--light-info);
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    .text-success {
+        color: var(--success-color) !important;
+    }
+
+    .text-danger {
+        color: var(--danger-color) !important;
+    }
+
+    .text-info {
+        color: var(--info-color) !important;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+        border-radius: 0.75rem;
+    }
+
+    .empty-state-icon {
+        color: #dee2e6;
+    }
+
+    /* Search box styling */
+    .filter-section {
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+        .filter-section:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+        }
+
+    .search-focused {
+        box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15) !important;
+    }
+
+    .input-group-text {
+        border-radius: 0.5rem 0 0 0.5rem;
+        border-right: none;
+    }
+
+    .input-group .form-control {
+        border-radius: 0;
+        box-shadow: none !important;
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+        border-left: none;
+    }
+
+        .input-group .form-control:focus {
+            border-color: var(--border-color);
+        }
+
+    .input-group .btn {
+        border-radius: 0 0.5rem 0.5rem 0;
+        border-left: none;
+    }
+
+    /* Account number styling */
+    .account-number {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .account-number-full {
+        display: none;
+        margin-top: 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .account-number.show-full .account-number-full {
+        display: block;
+    }
+
+    /* Summary cards */
+    .summary-card {
+        transition: all 0.3s ease;
+    }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08) !important;
+        }
+
+    .summary-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    /* List view styling */
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        transition: background-color 0.2s;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-group-item:hover {
+            background-color: rgba(0,0,0,0.01);
+        }
+
+    /* View toggle buttons */
+    .btn-group .btn {
+        padding: 0.375rem 0.75rem;
+    }
+
+        .btn-group .btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+  
+
+    .fade-in {
+        animation: fadeIn 0.3s ease forwards;
+    }
+</style>
+
