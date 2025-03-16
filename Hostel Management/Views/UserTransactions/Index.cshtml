@@ -1,291 +1,312 @@
-﻿@using Microsoft.CodeAnalysis.Differencing
-@using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor
+﻿@using Hostel_Management.Models.Model
 @model IEnumerable<Hostel_Management.Models.Model.UserTransaction>
 
 @{
     ViewData["Title"] = "Transactions";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int itemsPerPage = 30; // Number of transactions per page
 }
 
-<div class="transaction-dashboard">
-    <!-- Page Header -->
-    <div class="page-header d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">User Transactions</h1>
-        <div class="d-flex">
-            <button id="filterToggle" class="btn btn-light me-2">
-                <i class="fas fa-filter"></i> Filters
-            </button>
-            <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-plus"></i> Actions
+<div class="transaction-dashboard py-4">
+    <div class="container-fluid px-4">
+        <!-- Page Header -->
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1 fw-bold text-primary">Transaction History</h1>
+                <p class="text-muted mb-0">Manage and track your financial activities</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="filterToggle" class="btn btn-light">
+                    <i class="fas fa-filter me-2"></i>Filters
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionDropdown">
-                    <li>
-                        <a class="dropdown-item" href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "receive" })">
-                            <i class="fas fa-arrow-down text-success"></i> Cash In
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "send" })">
-                            <i class="fas fa-arrow-up text-danger"></i> Cash Out
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#" id="exportCsv">
-                            <i class="fas fa-file-csv"></i> Export CSV
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#" id="printReport">
-                            <i class="fas fa-print"></i> Print
-                        </a>
-                    </li>
-                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus me-2"></i>Actions
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="actionDropdown">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })">
+                                <i class="fas fa-arrow-down text-success me-2"></i> Cash In
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })">
+                                <i class="fas fa-arrow-up text-danger me-2"></i> Cash Out
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="exportCsv">
+                                <i class="fas fa-file-csv me-2 text-primary"></i> Export CSV
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="printReport">
+                                <i class="fas fa-print me-2 text-primary"></i> Print Report
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Filter Panel -->
-    <div id="filterPanel" class="card shadow-sm mb-4" style="display: none;">
-        <div class="card-body">
-            <form id="filterForm" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Date Range</label>
-                    <div class="input-group">
-                        <input type="text" id="dateRangePicker" class="form-control" placeholder="Select date range">
-                        <span class="input-group-text">
-                            <i class="fas fa-calendar"></i>
+        <!-- Filter Panel -->
+        <div id="filterPanel" class="card border-0 shadow-sm mb-4" style="display: none;">
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Date Range</label>
+                        <div class="input-group">
+                            <input type="text" id="dateRangePicker" class="form-control" placeholder="Select date range">
+                            <span class="input-group-text">
+                                <i class="fas fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Transaction Type</label>
+                        <select id="transactionType" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="Credit">Credit (Cash In)</option>
+                            <option value="Debit">Debit (Cash Out)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Amount Range</label>
+                        <div class="input-group">
+                            <input type="number" id="minAmount" class="form-control" placeholder="Min">
+                            <span class="input-group-text">to</span>
+                            <input type="number" id="maxAmount" class="form-control" placeholder="Max">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Wallet</label>
+                        <select id="walletFilter" class="form-select">
+                            <option value="">All Wallets</option>
+                            @foreach (var wallet in Model.Select(x => x.Wallet).DistinctBy(w => w.Id))
+                            {
+                                <option value="@wallet.Id">@wallet.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="button" id="resetFilters" class="btn btn-light me-2">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </button>
+                        <button type="button" id="applyFilters" class="btn btn-primary">
+                            <i class="fas fa-check me-1"></i> Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100 dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-normal mb-1">Total Credit</h6>
+                                <h3 class="fw-bold text-success mb-0" id="totalCredit">
+                                    @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType == TransactionType.Credit).Sum(x => x.Amount).ToString("N2")
+                                </h3>
+                            </div>
+                            <div class="icon-shape bg-light-success text-success rounded-circle">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 mb-0 text-muted small">
+                            <span id="creditCount">@Model.Count(x => x.TransactionType == TransactionType.Credit) transactions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100 dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-normal mb-1">Total Debit</h6>
+                                <h3 class="fw-bold text-danger mb-0" id="totalDebit">
+                                    @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType == TransactionType.Debit).Sum(x => x.Amount).ToString("N2")
+                                </h3>
+                            </div>
+                            <div class="icon-shape bg-light-danger text-danger rounded-circle">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 mb-0 text-muted small">
+                            <span id="debitCount">@Model.Count(x => x.TransactionType == TransactionType.Debit) transactions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100 dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-normal mb-1">Net Balance</h6>
+                                @{
+                                    var netAmount = Model.Where(x => x.TransactionType == TransactionType.Credit).Sum(x => x.Amount) -
+                                    Model.Where(x => x.TransactionType == TransactionType.Debit).Sum(x => x.Amount);
+                                    var textColorClass = netAmount >= 0 ? "text-primary" : "text-danger";
+                                }
+                                <h3 class="fw-bold @textColorClass mb-0" id="netBalance">@ViewBag.CurrencyCode @netAmount.ToString("N2")</h3>
+                            </div>
+                            <div class="icon-shape bg-light-primary text-primary rounded-circle">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 mb-0 text-muted small">
+                            <span>Current balance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100 dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-normal mb-1">Total Transactions</h6>
+                                <h3 class="fw-bold text-dark mb-0" id="totalTransactions">@Model.Count()</h3>
+                            </div>
+                            <div class="icon-shape bg-light-dark text-dark rounded-circle">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 mb-0 text-muted small">
+                            <span id="transactionPeriod">All time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-primary">Transaction History</h5>
+                <div class="d-flex align-items-center">
+                    <div class="input-group search-box">
+                        <input type="text" id="searchTransactions" class="form-control" placeholder="Search transactions...">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-muted"></i>
                         </span>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Transaction Type</label>
-                    <select id="transactionType" class="form-select">
-                        <option value="">All Types</option>
-                        <option value="Receive">Credit (Receive)</option>
-                        <option value="Send">Debit (Send)</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Amount Range</label>
-                    <div class="input-group">
-                        <input type="number" id="minAmount" class="form-control" placeholder="Min">
-                        <span class="input-group-text">to</span>
-                        <input type="number" id="maxAmount" class="form-control" placeholder="Max">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Wallet</label>
-                    <select id="walletFilter" class="form-select">
-                        <option value="">All Wallets</option>
-                        @foreach (var wallet in Model.Select(x => x.Wallet).DistinctBy(w => w.Id))
-                        {
-                            <option value="@wallet.Id">@wallet.Name</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-12 d-flex justify-content-end">
-                    <button type="button" id="resetFilters" class="btn btn-light me-2">Reset</button>
-                    <button type="button" id="applyFilters" class="btn btn-primary">Apply Filters</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Dashboard Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted fw-normal mb-0">Total Credit</h6>
-                            <h3 class="fw-bold text-success mb-0">
-                                @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount).ToString("N2")
-                            </h3>
-                        </div>
-                        <div class="icon-shape bg-light-success text-success rounded p-3">
-                            <i class="fas fa-arrow-down"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3 mb-0 text-muted small">
-                        <span>@Model.Count(x => x.TransactionType.ToString() == "Credit") transactions</span>
-                    </div>
-                </div>
             </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted fw-normal mb-0">Total Debit</h6>
-                            <h3 class="fw-bold text-danger mb-0">
-                                @ViewBag.CurrencyCode @Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount).ToString("N2")
-                            </h3>
-                        </div>
-                        <div class="icon-shape bg-light-danger text-danger rounded p-3">
-                            <i class="fas fa-arrow-up"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3 mb-0 text-muted small">
-                        <span>@Model.Count(x => x.TransactionType.ToString() == "Debit") transactions</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted fw-normal mb-0">Net Balance</h6>
-                            @{
-                                var netAmount = Model.Where(x => x.TransactionType.ToString() == "Credit").Sum(x => x.Amount) -
-                                Model.Where(x => x.TransactionType.ToString() == "Debit").Sum(x => x.Amount);
-                                var textColorClass = netAmount >= 0 ? "text-primary" : "text-danger";
-
-                               
-                            }
-                            <h3 class="fw-bold @textColorClass mb-0">@ViewBag.CurrencyCode @netAmount.ToString("N2")</h3>
-                        </div>
-                        <div class="icon-shape bg-light-primary text-primary rounded p-3">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3 mb-0 text-muted small">
-                        <span>Current balance</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted fw-normal mb-0">Total Transactions</h6>
-                            <h3 class="fw-bold text-dark mb-0">@Model.Count()</h3>
-                        </div>
-                        <div class="icon-shape bg-light-dark text-dark rounded p-3">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3 mb-0 text-muted small">
-                        <span>All time</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transactions Table Card -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3">
-            <h5 class="mb-0 fw-bold">Transaction History</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table id="transactionsTable" class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                         
-                            <th>@Html.DisplayNameFor(model => model.Amount)</th>
-                            <th>@Html.DisplayNameFor(model => model.TransactionType)</th>
-                            <th>@Html.DisplayNameFor(model => model.Note)</th>
-                            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            int index = 1;
-                        }
-                        @foreach (var item in Model)
-                        {
-                            <tr class="transaction-row"
-                            data-type="@item.TransactionType"
-                            data-amount="@item.Amount"
-                            data-wallet="@item.Wallet.Id"
-                            data-date="@item.CreatedAt.ToString("yyyy-MM-dd")">
-                                <td>@index</td>
-                               
-                                <td class="fw-medium">@ViewBag.CurrencyCode @item.Amount.ToString("N2")</td>
-                                <td>
-                                    <span class="badge @(item.TransactionType.ToString() == "Receive" ? "bg-success" : "bg-danger")">
-                                        @Html.DisplayFor(modelItem => item.TransactionType)
-                                    </span>
-                                </td>
-                                <td>@Html.DisplayFor(modelItem => item.Note)</td>
-                                <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm tt")</td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item" href="@Url.Action("Edit", new { id = item.Id })">
-                                                    <i class="fas fa-edit me-2 text-primary"></i> Edit
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="@Url.Action("Details", new { id = item.Id })">
-                                                    <i class="fas fa-info-circle me-2 text-info"></i> Details
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = item.Id })">
-                                                    <i class="fas fa-trash me-2"></i> Delete
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="transactionsTable" class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Note</th>
+                                <th>Date</th>
+                                <th class="text-end pe-4">Actions</th>
                             </tr>
-                            index++;
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="transactionTableBody">
+                            @{
+                                int index = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr class="transaction-row"
+                                    data-type="@item.TransactionType"
+                                    data-amount="@item.Amount"
+                                    data-wallet="@item.Wallet.Id"
+                                    data-date="@item.CreatedAt.ToString("yyyy-MM-dd")">
+                                    <td class="ps-4">@index</td>
+                                    <td class="fw-medium">@ViewBag.CurrencyCode @item.Amount.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge @(item.TransactionType == TransactionType.Credit ? "bg-success" : "bg-danger")">
+                                            @item.TransactionType
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="transaction-note" data-bs-toggle="tooltip" data-bs-placement="top" title="@(string.IsNullOrEmpty(item.Note) ? "-" : item.Note)">
+                                            @(string.IsNullOrEmpty(item.Note) ? "-" : item.Note)
+                                        </div>
+                                    </td>
+                                    <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td class="text-end pe-4">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v text-muted"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-up shadow-sm">
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { id = item.Id,walletId= @ViewBag.Id,createdType=item.TransactionType==TransactionType.Credit?"receive":"send" })">
+                                                        <i class="fas fa-edit me-2 text-primary"></i> Edit
+                                                    </a>
+                                                </li>
+                                              
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center text-danger" href="@Url.Action("Delete", new { id = item.Id })">
+                                                        <i class="fas fa-trash me-2"></i> Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
+                <div class="text-muted small" id="tableInfo">
+                    Showing <span id="visibleCount">@Model.Count()</span> of <span id="totalCount">@Model.Count()</span> transactions
+                </div>
+                <nav aria-label="Transactions pagination">
+                    <ul class="pagination pagination-sm mb-0" id="pagination">
+                        <li class="page-item disabled" id="prevPage">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <!-- Pagination will be generated by JavaScript -->
+                        <li class="page-item active">
+                            <a class="page-link" href="#" data-page="1">1</a>
+                        </li>
+                        <li class="page-item disabled" id="nextPage">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
-        <div class="card-footer bg-white py-3">
-            <nav aria-label="Transactions pagination">
-                <ul class="pagination justify-content-end mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item active">
-                        <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </nav>
+
+        <!-- No Results Message -->
+        <div id="noResultsMessage" class="text-center py-5 mt-4 d-none">
+            <div class="empty-state">
+                <div class="empty-state-icon mb-3">
+                    <i class="fas fa-search text-muted fa-3x"></i>
+                </div>
+                <h3 class="h5 mb-2">No Matching Transactions</h3>
+                <p class="text-muted mb-3">Try adjusting your search criteria</p>
+                <button type="button" class="btn btn-outline-primary" id="clearAllFilters">
+                    <i class="fas fa-times me-2"></i>Clear All Filters
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Action Buttons -->
+<!-- Floating Action Buttons -->
 <div class="action-buttons">
-    <a href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "receive" })" class="btn btn-success btn-circle">
+    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })" class="btn btn-success btn-circle" data-bs-toggle="tooltip" data-bs-placement="left" title="Cash In">
         <i class="fas fa-arrow-down"></i>
     </a>
-    <a href="@Url.Action("Create", new { id = ViewBag.Id, createdType = "send" })" class="btn btn-danger btn-circle">
+    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })" class="btn btn-danger btn-circle" data-bs-toggle="tooltip" data-bs-placement="left" title="Cash Out">
         <i class="fas fa-arrow-up"></i>
     </a>
 </div>
@@ -297,7 +318,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Initialize date range picker with single month view
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Pagination variables
+            const itemsPerPage = 30;
+            let currentPage = 1;
+            let filteredRows = $('.transaction-row');
+
+            // Initialize pagination
+            initPagination();
+
+            // Initialize date range picker
             $('#dateRangePicker').daterangepicker({
                 opens: 'left',
                 autoUpdateInput: false,
@@ -315,23 +350,25 @@
                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 },
                 maxDate: moment(),
-                // Fix for showing only one month
-                singleDatePicker: false,
-                showCustomRangeLabel: true,
-                linkedCalendars: false // This is the key fix to show only one calendar
+                linkedCalendars: false
             });
 
             $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
                 $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+                // Update transaction period text
+                $('#transactionPeriod').text(picker.startDate.format('MMM D') + ' - ' + picker.endDate.format('MMM D, YYYY'));
             });
 
             $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
                 $(this).val('');
+                $('#transactionPeriod').text('All time');
             });
 
-            // Toggle filter panel
+            // Toggle filter panel with animation
             $('#filterToggle').click(function() {
                 $('#filterPanel').slideToggle(300);
+                $(this).toggleClass('active');
             });
 
             // Apply filters
@@ -342,17 +379,78 @@
             // Reset filters
             $('#resetFilters').click(function() {
                 $('#filterForm')[0].reset();
+                $('#transactionPeriod').text('All time');
                 $('.transaction-row').show();
+                filteredRows = $('.transaction-row');
                 updateDashboardSummary();
+                updateTableInfo();
+                $('#noResultsMessage').addClass('d-none');
+                currentPage = 1;
+                initPagination();
+                showPage(currentPage);
             });
 
-            // Filter transactions function - FIXED to properly handle transaction types
+            // Clear all filters from no results message
+            $('#clearAllFilters').click(function() {
+                $('#filterForm')[0].reset();
+                $('#searchTransactions').val('');
+                $('#transactionPeriod').text('All time');
+                $('.transaction-row').show();
+                filteredRows = $('.transaction-row');
+                updateDashboardSummary();
+                updateTableInfo();
+                $('#noResultsMessage').addClass('d-none');
+                currentPage = 1;
+                initPagination();
+                showPage(currentPage);
+            });
+
+            // Search functionality
+            $('#searchTransactions').on('input', function() {
+                const searchTerm = $(this).val().toLowerCase().trim();
+
+                if (searchTerm === '') {
+                    // If search is cleared, show all rows or apply other active filters
+                    filterTransactions();
+                } else {
+                    // Filter rows based on search term
+                    $('.transaction-row').each(function() {
+                        const $row = $(this);
+                        const rowText = $row.text().toLowerCase();
+
+                        if (rowText.includes(searchTerm)) {
+                            $row.show();
+                        } else {
+                            $row.hide();
+                        }
+                    });
+
+                    filteredRows = $('.transaction-row:visible');
+                    updateDashboardSummary();
+                    updateTableInfo();
+
+                    // Show no results message if needed
+                    if (filteredRows.length === 0) {
+                        $('#noResultsMessage').removeClass('d-none');
+                    } else {
+                        $('#noResultsMessage').addClass('d-none');
+                    }
+
+                    // Reset pagination
+                    currentPage = 1;
+                    initPagination();
+                    showPage(currentPage);
+                }
+            });
+
+            // Filter transactions function
             function filterTransactions() {
                 const dateRange = $('#dateRangePicker').val();
                 const transactionType = $('#transactionType').val();
                 const minAmount = $('#minAmount').val() ? parseFloat($('#minAmount').val()) : 0;
                 const maxAmount = $('#maxAmount').val() ? parseFloat($('#maxAmount').val()) : Infinity;
                 const walletId = $('#walletFilter').val();
+                const searchTerm = $('#searchTransactions').val().toLowerCase().trim();
 
                 let startDate, endDate;
 
@@ -364,11 +462,11 @@
 
                 $('.transaction-row').each(function() {
                     const $row = $(this);
-                    // Fix: Get the badge text content for transaction type
-                    const rowType = $row.find('td:eq(3) .badge').text().trim();
+                    const rowType = $row.data('type');
                     const rowAmount = parseFloat($row.data('amount'));
                     const rowWallet = $row.data('wallet').toString();
                     const rowDate = moment($row.data('date'));
+                    const rowText = $row.text().toLowerCase();
 
                     let showRow = true;
 
@@ -377,14 +475,9 @@
                         showRow = false;
                     }
 
-                    // Filter by transaction type - FIXED to match dropdown values with badge text
-                    if (transactionType && transactionType !== '') {
-                        // Check if the selected type matches the row type
-                        if (transactionType === 'Receive' && rowType !== 'Credit') {
-                            showRow = false;
-                        } else if (transactionType === 'Send' && rowType !== 'Debit') {
-                            showRow = false;
-                        }
+                    // Filter by transaction type
+                    if (transactionType && transactionType !== '' && rowType !== transactionType) {
+                        showRow = false;
                     }
 
                     // Filter by amount range
@@ -397,75 +490,196 @@
                         showRow = false;
                     }
 
+                    // Filter by search term
+                    if (searchTerm && !rowText.includes(searchTerm)) {
+                        showRow = false;
+                    }
+
                     $row.toggle(showRow);
                 });
 
+                filteredRows = $('.transaction-row:visible');
                 updateDashboardSummary();
+                updateTableInfo();
+
+                // Show no results message if needed
+                if (filteredRows.length === 0) {
+                    $('#noResultsMessage').removeClass('d-none');
+                } else {
+                    $('#noResultsMessage').addClass('d-none');
+                }
+
+                // Reset pagination
+                currentPage = 1;
+                initPagination();
+                showPage(currentPage);
             }
 
             // Update dashboard summary based on visible rows
             function updateDashboardSummary() {
                 let totalCredit = 0;
                 let totalDebit = 0;
-                let totalTransactions = 0;
+                let creditCount = 0;
+                let debitCount = 0;
 
-                $('.transaction-row:visible').each(function() {
+                filteredRows.each(function() {
                     const $row = $(this);
-                    // Fix: Get the badge text content
-                    const rowType = $row.find('td:eq(3) .badge').text().trim();
+                    const rowType = $row.data('type');
                     const rowAmount = parseFloat($row.data('amount'));
 
                     if (rowType === 'Credit') {
                         totalCredit += rowAmount;
+                        creditCount++;
                     } else if (rowType === 'Debit') {
                         totalDebit += rowAmount;
+                        debitCount++;
                     }
-
-                    totalTransactions++;
                 });
 
                 const netAmount = totalCredit - totalDebit;
                 const netClass = netAmount >= 0 ? 'text-primary' : 'text-danger';
+                const currencyCode = '@ViewBag.CurrencyCode';
 
                 // Update the dashboard cards
-                $('.card:eq(0) h3').text('$' + totalCredit.toFixed(2));
-                $('.card:eq(0) .mt-3 span').text(
-                    $('.transaction-row:visible').filter(function() {
-                        return $(this).find('td:eq(3) .badge').text().trim() === 'Credit';
-                    }).length + ' transactions'
-                );
+                $('#totalCredit').text(currencyCode + ' ' + totalCredit.toFixed(2));
+                $('#creditCount').text(creditCount + ' transactions');
 
-                $('.card:eq(1) h3').text('$' + totalDebit.toFixed(2));
-                $('.card:eq(1) .mt-3 span').text(
-                    $('.transaction-row:visible').filter(function() {
-                        return $(this).find('td:eq(3) .badge').text().trim() === 'Debit';
-                    }).length + ' transactions'
-                );
+                $('#totalDebit').text(currencyCode + ' ' + totalDebit.toFixed(2));
+                $('#debitCount').text(debitCount + ' transactions');
 
-                $('.card:eq(2) h3').removeClass('text-primary text-danger').addClass(netClass).text('$' + netAmount.toFixed(2));
+                $('#netBalance').removeClass('text-primary text-danger').addClass(netClass).text(currencyCode + ' ' + netAmount.toFixed(2));
 
-                $('.card:eq(3) h3').text(totalTransactions);
+                $('#totalTransactions').text(filteredRows.length);
             }
+
+            // Update table info
+            function updateTableInfo() {
+                const visibleCount = filteredRows.length;
+                const totalCount = $('.transaction-row').length;
+
+                $('#visibleCount').text(visibleCount);
+                $('#totalCount').text(totalCount);
+            }
+
+            // Initialize pagination
+            function initPagination() {
+                const totalRows = filteredRows.length;
+                const totalPages = Math.ceil(totalRows / itemsPerPage);
+
+                // Clear pagination
+                const $pagination = $('#pagination');
+                $pagination.find('li.page-item:not(:first-child):not(:last-child)').remove();
+
+                // Add page numbers
+                const $prevPage = $('#prevPage');
+                const $nextPage = $('#nextPage');
+
+                if (totalPages <= 1) {
+                    $prevPage.addClass('disabled');
+                    $nextPage.addClass('disabled');
+
+                    // Add single page
+                    const $pageItem = $('<li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>');
+                    $pageItem.insertBefore($nextPage);
+                } else {
+                    // Add page numbers (max 5 visible)
+                    const maxVisiblePages = 5;
+                    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                        const $pageItem = $('<li class="page-item' + (i === currentPage ? ' active' : '') + '"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>');
+                        $pageItem.insertBefore($nextPage);
+                    }
+
+                    // Update prev/next buttons
+                    if (currentPage === 1) {
+                        $prevPage.addClass('disabled');
+                    } else {
+                        $prevPage.removeClass('disabled');
+                    }
+
+                    if (currentPage === totalPages) {
+                        $nextPage.addClass('disabled');
+                    } else {
+                        $nextPage.removeClass('disabled');
+                    }
+                }
+
+                // Add click handlers
+                $('.page-link').off('click').on('click', function(e) {
+                    e.preventDefault();
+
+                    if ($(this).parent().hasClass('disabled')) {
+                        return;
+                    }
+
+                    if ($(this).parent().is('#prevPage')) {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            showPage(currentPage);
+                            initPagination();
+                        }
+                    } else if ($(this).parent().is('#nextPage')) {
+                        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            showPage(currentPage);
+                            initPagination();
+                        }
+                    } else {
+                        const page = parseInt($(this).data('page'));
+                        if (page !== currentPage) {
+                            currentPage = page;
+                            showPage(currentPage);
+                            initPagination();
+                        }
+                    }
+                });
+            }
+
+            // Show specific page
+            function showPage(page) {
+                const startIndex = (page - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+
+                // Hide all rows first
+                filteredRows.hide();
+
+                // Show only rows for current page
+                filteredRows.slice(startIndex, endIndex).show();
+
+                // Update row numbers
+                filteredRows.each(function(index) {
+                    $(this).find('td:first').text(index + 1);
+                });
+            }
+
+            // Initial page display
+            showPage(currentPage);
 
             // Export to CSV
             $('#exportCsv').click(function(e) {
                 e.preventDefault();
 
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "ID,Wallet,Amount,Type,Note,Date\n";
+                csvContent += "ID,Amount,Type,Note,Date\n";
 
-                $('.transaction-row:visible').each(function() {
+                filteredRows.each(function() {
                     const $row = $(this);
                     const cells = $row.find('td');
 
                     const id = $(cells[0]).text();
-                    const wallet = $(cells[1]).text();
-                    const amount = $(cells[2]).text().replace('$', '');
-                    const type = $(cells[3]).text().trim();
-                    const note = $(cells[4]).text();
-                    const date = $(cells[5]).text();
+                    const amount = $(cells[1]).text().replace('@ViewBag.CurrencyCode', '').trim();
+                    const type = $(cells[2]).text().trim();
+                    const note = $(cells[3]).find('.transaction-note').attr('title').trim();
+                    const date = $(cells[4]).text().trim();
 
-                    csvContent += `${id},"${wallet}",${amount},"${type}","${note}","${date}"\n`;
+                    csvContent += `${id},${amount},"${type}","${note}","${date}"\n`;
                 });
 
                 const encodedUri = encodeURI(csvContent);
@@ -493,17 +707,16 @@
 
                 // Get visible transactions
                 const visibleTransactions = [];
-                $('.transaction-row:visible').each(function() {
+                filteredRows.each(function() {
                     const $row = $(this);
                     const cells = $row.find('td');
 
                     visibleTransactions.push({
                         id: $(cells[0]).text(),
-                        wallet: $(cells[1]).text(),
-                        amount: $(cells[2]).text(),
-                        type: $(cells[3]).text().trim(),
-                        note: $(cells[4]).text(),
-                        date: $(cells[5]).text()
+                        amount: $(cells[1]).text(),
+                        type: $(cells[2]).text().trim(),
+                        note: $(cells[3]).find('.transaction-note').attr('title'),
+                        date: $(cells[4]).text()
                     });
                 });
 
@@ -534,21 +747,21 @@
                 doc.line(14, 58, 196, 58);
 
                 // Calculate summary data
-                const totalCredit = parseFloat($('.card:eq(0) h3').text().replace('$', ''));
-                const totalDebit = parseFloat($('.card:eq(1) h3').text().replace('$', ''));
-                const netBalance = parseFloat($('.card:eq(2) h3').text().replace('$', ''));
-                const totalTransactions = parseInt($('.card:eq(3) h3').text());
+                const totalCredit = parseFloat($('#totalCredit').text().replace('@ViewBag.CurrencyCode', '').trim());
+                const totalDebit = parseFloat($('#totalDebit').text().replace('@ViewBag.CurrencyCode', '').trim());
+                const netBalance = parseFloat($('#netBalance').text().replace('@ViewBag.CurrencyCode', '').trim());
+                const totalTransactions = parseInt($('#totalTransactions').text());
 
                 // Add summary table
                 doc.setFontSize(10);
                 doc.text('Total Credit:', 20, 68);
-                doc.text(`$${totalCredit.toFixed(2)}`, 70, 68);
+                doc.text(`@ViewBag.CurrencyCode ${totalCredit.toFixed(2)}`, 70, 68);
 
                 doc.text('Total Debit:', 20, 76);
-                doc.text(`$${totalDebit.toFixed(2)}`, 70, 76);
+                doc.text(`@ViewBag.CurrencyCode ${totalDebit.toFixed(2)}`, 70, 76);
 
                 doc.text('Net Balance:', 20, 84);
-                doc.text(`$${netBalance.toFixed(2)}`, 70, 84);
+                doc.text(`@ViewBag.CurrencyCode ${netBalance.toFixed(2)}`, 70, 84);
 
                 doc.text('Total Transactions:', 20, 92);
                 doc.text(`${totalTransactions}`, 70, 92);
@@ -562,10 +775,9 @@
                 doc.setFontSize(10);
                 doc.setTextColor(100, 100, 100);
                 doc.text('ID', 15, 122);
-                doc.text('Wallet', 30, 122);
-                doc.text('Amount', 80, 122);
-                doc.text('Type', 110, 122);
-                doc.text('Note', 130, 122);
+                doc.text('Amount', 40, 122);
+                doc.text('Type', 80, 122);
+                doc.text('Note', 110, 122);
                 doc.text('Date', 170, 122);
 
                 doc.line(14, 125, 196, 125);
@@ -584,10 +796,9 @@
                         doc.setFontSize(10);
                         doc.setTextColor(100, 100, 100);
                         doc.text('ID', 15, y);
-                        doc.text('Wallet', 30, y);
-                        doc.text('Amount', 80, y);
-                        doc.text('Type', 110, y);
-                        doc.text('Note', 130, y);
+                        doc.text('Amount', 40, y);
+                        doc.text('Type', 80, y);
+                        doc.text('Note', 110, y);
                         doc.text('Date', 170, y);
 
                         doc.line(14, y + 3, 196, y + 3);
@@ -596,28 +807,33 @@
                     }
 
                     // Set color for transaction type
-                    if (transaction.type === 'Credit') {
+                    if (transaction.type.includes('Credit')) {
                         doc.setTextColor(40, 167, 69); // Green
                     } else {
                         doc.setTextColor(220, 53, 69); // Red
                     }
-                    doc.text(transaction.type, 110, y);
+                    doc.text(transaction.type, 80, y);
                     doc.setTextColor(0, 0, 0);
 
                     // Other columns
                     doc.text(transaction.id, 15, y);
+                    doc.text(transaction.amount, 40, y);
 
-                    // Truncate wallet name if too long
-                    const walletName = transaction.wallet.length > 20 ?
-                        transaction.wallet.substring(0, 17) + '...' : transaction.wallet;
-                    doc.text(walletName, 30, y);
+                    // Don't truncate note in PDF
+                    const note = transaction.note || "-";
 
-                    doc.text(transaction.amount, 80, y);
+                    // Handle long notes by wrapping text
+                    if (note.length > 40) {
+                        const splitNote = doc.splitTextToSize(note, 55);
+                        doc.text(splitNote, 110, y);
 
-                    // Truncate note if too long
-                    const note = transaction.note.length > 15 ?
-                        transaction.note.substring(0, 12) + '...' : transaction.note;
-                    doc.text(note, 130, y);
+                        // Adjust y position if note takes multiple lines
+                        if (splitNote.length > 1) {
+                            y += (splitNote.length - 1) * 5;
+                        }
+                    } else {
+                        doc.text(note, 110, y);
+                    }
 
                     doc.text(transaction.date, 170, y);
 
@@ -659,13 +875,14 @@
             --primary-hover: #5D3E56;
             --success-color: #28a745;
             --danger-color: #dc3545;
+            --info-color: #17a2b8;
             --light-success: #e6f7e9;
             --light-danger: #fbe7e9;
             --light-primary: #f0e8f0;
             --light-dark: #f1f1f1;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         body {
@@ -675,30 +892,28 @@
         }
 
         .transaction-dashboard {
-            padding: 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 1.5rem 0;
         }
 
         .page-header h1 {
             color: var(--primary-color);
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.02em;
         }
 
         /* Card styling */
         .card {
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             box-shadow: var(--card-shadow);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
             overflow: hidden;
         }
 
-            .card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
 
         .card-header {
             background-color: #fff;
@@ -708,7 +923,7 @@
 
             .card-header h5 {
                 margin: 0;
-                color: #333;
+                color: var(--primary-color);
                 font-weight: 600;
             }
 
@@ -723,15 +938,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 50%;
+            font-size: 1.25rem;
         }
 
         /* Button styling */
         .btn {
             font-weight: 500;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             padding: 0.5rem 1rem;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -757,6 +973,22 @@
                 color: #212529;
             }
 
+            .btn-light.active {
+                background-color: var(--light-primary);
+                color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
         /* Table styling */
         .table {
             color: #212529;
@@ -766,7 +998,7 @@
             .table thead th {
                 background-color: #f8f9fa;
                 color: var(--text-muted);
-                font-weight: 500;
+                font-weight: 600;
                 text-transform: uppercase;
                 font-size: 0.7rem;
                 letter-spacing: 0.5px;
@@ -788,11 +1020,10 @@
                 background-color: rgba(113, 75, 103, 0.03);
             }
 
-        /* Badge styling */
         .badge {
-            padding: 0.4em 0.65em;
+            padding: 0.5em 0.75em;
             font-weight: 500;
-            border-radius: 6px;
+            border-radius: 0.5rem;
             font-size: 0.75rem;
         }
 
@@ -806,10 +1037,10 @@
             color: var(--danger-color) !important;
         }
 
-        /* Filter panel styling */
         #filterPanel {
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
         }
 
         .form-label {
@@ -821,9 +1052,10 @@
 
         .form-control, .form-select {
             border-color: var(--border-color);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.75rem;
             font-size: 0.875rem;
+            transition: all 0.3s ease;
         }
 
             .form-control:focus, .form-select:focus {
@@ -834,9 +1066,31 @@
         .input-group-text {
             background-color: #fff;
             border-color: var(--border-color);
+            border-radius: 0.75rem;
         }
 
-        /* Action buttons */
+        .search-box {
+            max-width: 300px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+            .search-box:focus-within {
+                box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15);
+                border-color: var(--primary-color);
+            }
+
+            .search-box .form-control {
+                border: none;
+                padding-left: 1rem;
+            }
+
+            .search-box .input-group-text {
+                border: none;
+            }
+
         .action-buttons {
             position: fixed;
             bottom: 2rem;
@@ -855,19 +1109,18 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
         }
 
             .btn-circle:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             }
 
             .btn-circle i {
                 font-size: 1.25rem;
             }
 
-        /* Pagination styling */
         .pagination {
             margin-bottom: 0;
         }
@@ -875,8 +1128,10 @@
         .page-link {
             color: var(--primary-color);
             border: 1px solid var(--border-color);
-            padding: 0.5rem 0.75rem;
+            padding: 0.4rem 0.75rem;
             font-size: 0.875rem;
+            border-radius: 0.5rem;
+            margin: 0 0.15rem;
         }
 
         .page-item.active .page-link {
@@ -884,16 +1139,28 @@
             border-color: var(--primary-color);
         }
 
-        /* Date range picker customization */
+        .empty-state {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .empty-state-icon {
+            color: #dee2e6;
+        }
+
         .daterangepicker {
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             border: none;
             font-family: 'Inter', 'Roboto', sans-serif;
         }
 
             .daterangepicker .calendar-table {
-                border-radius: 0.5rem;
+                border-radius: 0.75rem;
             }
 
             .daterangepicker td.active, .daterangepicker td.active:hover {
@@ -904,56 +1171,25 @@
                 background-color: var(--primary-color);
             }
 
-        /* Loading indicator */
+        .transaction-note {
+            display: block;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         #pdfLoading {
-            background-color: rgba(255,255,255,0.8);
+            background-color: rgba(255,255,255,0.9);
             backdrop-filter: blur(4px);
         }
 
-        /* Responsive adjustments */
+        .dropdown-menu-up {
+            top: auto !important;
+            bottom: 100% !important;
+            margin-bottom: 0.125rem !important;
+        }
+
       
-        .card-body {
-            padding: 1rem;
-        }
-
-        .table thead th, .table tbody td {
-            padding: 0.75rem;
-        }
-
-        .action-buttons {
-            bottom: 1rem;
-            right: 1rem;
-        }
-
-        .btn-circle {
-            width: 3rem;
-            height: 3rem;
-        }
-
-        
-
-        /* Print styles */
-         .print {
-            .action-buttons, .btn, .dropdown, #filterToggle, .page-header .d-flex
-
-        {
-            display: none !important;
-        }
-
-        .card {
-            box-shadow: none !important;
-            border: 1px solid #ddd !important;
-            break-inside: avoid;
-        }
-
-        .transaction-dashboard {
-            padding: 0 !important;
-        }
-
-        body {
-            background-color: white !important;
-        }
-
-        }
     </style>
 }

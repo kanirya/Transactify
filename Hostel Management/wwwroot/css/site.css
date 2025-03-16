@@ -280,3 +280,94 @@ body {
 .rounded-lg {
     border-radius: 8px;
 }
+@media (max-width: 992px) {
+    .transaction-dashboard {
+        padding: 1rem 0;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table thead th, .table tbody td {
+        padding: 0.75rem;
+    }
+
+    .action-buttons {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .btn-circle {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .action-buttons {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .action-buttons, .btn, .dropdown, #filterToggle, .page-header .d-flex {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+
+    .transaction-dashboard {
+        padding: 0 !important;
+    }
+
+    body {
+        background-color: white !important;
+    }
+}
+
+
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wallet-summary-dashboard .card-body {
+        padding: 1rem;
+    }
+
+    .wallet-summary-dashboard h3 {
+        font-size: 1.5rem;
+    }
+}

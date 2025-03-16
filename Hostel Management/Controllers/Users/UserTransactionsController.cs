@@ -31,7 +31,7 @@ namespace Hostel_Management.Controllers.Users
             var transactions = await _context.UserTransactions
                 .Include(u => u.Wallet)
                 .ThenInclude(w => w.Currency) // Include Currency to access CurrencyCode
-                .Where(u => u.WalletId == id.Value)
+                .Where(u => u.WalletId == id.Value).OrderByDescending(u=>u.CreatedAt)
                 .ToListAsync();
 
 
@@ -42,7 +42,8 @@ namespace Hostel_Management.Controllers.Users
             if (Code == "PKR")
             {
                 ViewBag.CurrencyCode = "Rs";
-            }else if (Code == "USD")
+            }
+            else if (Code == "USD")
             {
                 ViewBag.CurrencyCode = "$";
             }
@@ -51,7 +52,7 @@ namespace Hostel_Management.Controllers.Users
                 ViewBag.CurrencyCode = Code;
             }
 
-            return View( transactions);
+            return View(transactions);
         }
 
 
@@ -74,69 +75,84 @@ namespace Hostel_Management.Controllers.Users
             return View(userTransaction);
         }
 
-        // GET: UserTransactions/Create
-        public IActionResult Create(Guid? id, string createdType)
+        [HttpGet]
+        [Route("UserTransactions/Create/{id?}")]
+        public async Task<IActionResult> Create(Guid? id, Guid? walletId, string createdType)
         {
+            ViewBag.Id = walletId;
+            ViewBag.CreatedType = createdType;
+            ViewBag.TransactionId = id;
 
-            ViewBag.Id = id;
-            ViewBag.createdType = createdType;
-            return View();
+            if (id.HasValue) // If id is provided, fetch the existing transaction for editing
+            {
+                var existingTransaction = await _context.UserTransactions.FindAsync(id.Value);
+                if (existingTransaction == null)
+                {
+                    return NotFound();
+                }
+                return View(existingTransaction); // Return the view with existing transaction data
+            }
+
+            return View(new UserTransaction()); // Return an empty model for new transaction
         }
 
-    
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( UserTransactionDTO userTran)
+        public async Task<IActionResult> Create(UserTransactionDTO userTran, Guid? id)
         {
-            Console.WriteLine("Waller ID: " + userTran.WalletId);
-            Console.WriteLine("Transaction type: " + userTran.TransactionType);
-
             var userTransaction = new UserTransaction();
-            if (ModelState.IsValid)
+
+            if (id.HasValue) // If id exists, update the existing transaction
             {
-                if (userTran.TransactionType == "send")
+                userTransaction = await _context.UserTransactions.FindAsync(id.Value);
+                if (userTransaction == null)
                 {
-                    userTransaction.TransactionType = TransactionType.Debit;
-                }else if(userTran.TransactionType== "receive")
-                {
-                    userTransaction.TransactionType = TransactionType.Credit;
-                }else
-                {
-                    return View(userTransaction);
+
+                    Console.WriteLine("working fine");
+                    return NotFound();
                 }
-                userTransaction.WalletId = userTran.WalletId;
-                userTransaction.Id = Guid.NewGuid();
+
+
                 userTransaction.Note = userTran.Note;
                 userTransaction.Amount = userTran.Amount;
-                _context.Add(userTransaction);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { id = userTransaction.WalletId });
+                _context.Update(userTransaction);
 
             }
-            ViewData["WalletId"] = new SelectList(_context.UserWallets, "Id", "Name", userTransaction.WalletId);
-            return View(userTransaction);
+            else
+            {
+                Console.WriteLine("Wallet ID: " + userTran.WalletId);
+                Console.WriteLine("Transaction type: " + userTran.TransactionType);
+
+                if (ModelState.IsValid)
+                {
+                    if (userTran.TransactionType == "send")
+                    {
+                        userTransaction.TransactionType = TransactionType.Debit;
+                    }
+                    else if (userTran.TransactionType == "receive")
+                    {
+                        userTransaction.TransactionType = TransactionType.Credit;
+                    }
+                    else
+                    {
+                        return View(userTransaction);
+                    }
+
+                    userTransaction.WalletId = userTran.WalletId;
+                    userTransaction.Id = Guid.NewGuid();
+                    userTransaction.Note = userTran.Note;
+                    userTransaction.Amount = userTran.Amount;
+                    _context.Add(userTransaction);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index), new { id = userTransaction.WalletId });
         }
 
-        // GET: UserTransactions/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var userTransaction = await _context.UserTransactions.FindAsync(id);
-            if (userTransaction == null)
-            {
-                return NotFound();
-            }
-            ViewData["WalletId"] = new SelectList(_context.UserWallets, "Id", "Name", userTransaction.WalletId);
-            return View(userTransaction);
-        }
-
-        // POST: UserTransactions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("Id,WalletId,Amount,TransactionType,Note,CreatedAt")] UserTransaction userTransaction)

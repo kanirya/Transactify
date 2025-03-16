@@ -78,7 +78,7 @@
                                 <a href="@Url.Action("Index")" class="btn btn-light">
                                     Cancel
                                 </a>
-                                <button type="submit" class="btn btn-@transactionColor px-4">
+                                <button type="submit" asp-route-id="@ViewBag.TransactionId" class="btn btn-@transactionColor px-4">
                                     <i class="fas fa-@transactionIcon me-1"></i> Create @transactionText
                                 </button>
                             </div>

@@ -10,9 +10,11 @@ using Hostel_Management.Models.Model;
 using Hostel_Management.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Hostel_Management.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hostel_Management.Controllers.Users
 {
+    [Authorize]
     public class UserWalletsController : Controller
     {
         private readonly AuthDbContext _context;
@@ -26,7 +28,12 @@ namespace Hostel_Management.Controllers.Users
         // GET: UserWallets
         public async Task<IActionResult> Index()
         {
-            var authDbContext = _context.UserWallets.Include(u => u.Currency).Include(u => u.User);
+            var user = await _userManager.GetUserAsync(User);
+            var authDbContext = _context.UserWallets
+                .Include(u => u.Currency)
+                .Where(u=>u.UserId==user.Id)
+                .Include(u => u.Transactions); // Include Transactions
+
             return View(await authDbContext.ToListAsync());
         }
 

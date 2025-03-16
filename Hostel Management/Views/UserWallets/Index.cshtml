@@ -1,8 +1,43 @@
 ﻿@model IEnumerable<Hostel_Management.Models.Model.UserWallet>
+@using Hostel_Management.Models.Model
 
 @{
     ViewData["Title"] = "My Wallets";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Calculate wallet summary statistics
+    decimal totalPositive = 0;
+    decimal totalNegative = 0;
+    decimal netTotal = 0;
+
+    foreach (var wallet in Model)
+    {
+        decimal walletNetAmount = 0;
+
+        if (wallet.Transactions != null && wallet.Transactions.Any())
+        {
+            decimal creditAmount = wallet.Transactions
+                .Where(t => t.TransactionType == TransactionType.Credit)
+                .Sum(t => t.Amount);
+
+            decimal debitAmount = wallet.Transactions
+                .Where(t => t.TransactionType == TransactionType.Debit)
+                .Sum(t => t.Amount);
+
+            walletNetAmount = creditAmount - debitAmount;
+        }
+
+        if (walletNetAmount > 0)
+        {
+            totalPositive += walletNetAmount;
+        }
+        else if (walletNetAmount < 0)
+        {
+            totalNegative += Math.Abs(walletNetAmount);
+        }
+
+        netTotal += walletNetAmount;
+    }
 }
 
 <div class="wallet-dashboard py-4">
@@ -16,6 +51,77 @@
             <a asp-action="Create" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>New Wallet
             </a>
+        </div>
+
+        <!-- Wallet Summary Dashboard -->
+        <div class="wallet-summary-dashboard mb-4 fade-in">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 dashboard-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-normal mb-1">Total Positive</h6>
+                                    <h3 class="fw-bold text-success mb-0">
+                                        + @totalPositive.ToString("N2")
+                                    </h3>
+                                </div>
+                                <div class="icon-shape bg-light-success text-success rounded-circle">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 mb-0 text-muted small">
+                                <span>Total from wallets with positive balance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 dashboard-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-normal mb-1">Total Negative</h6>
+                                    <h3 class="fw-bold text-danger mb-0">
+                                        - @totalNegative.ToString("N2")
+                                    </h3>
+                                </div>
+                                <div class="icon-shape bg-light-danger text-danger rounded-circle">
+                                    <i class="fas fa-minus"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 mb-0 text-muted small">
+                                <span>Total from wallets with negative balance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 dashboard-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-normal mb-1">Net Balance</h6>
+                                    @{
+                                        var netClass = netTotal >= 0 ? "text-success" : "text-danger";
+                                        var netPrefix = netTotal >= 0 ? "+" : "-";
+                                        var netFormatted = Math.Abs(netTotal).ToString("N2");
+                                    }
+                                    <h3 class="fw-bold @netClass mb-0">
+                                        @netPrefix @netFormatted
+                                    </h3>
+                                </div>
+                                <div class="icon-shape bg-light-primary text-primary rounded-circle">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 mb-0 text-muted small">
+                                <span>Net balance across all wallets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Simple Search Box -->
@@ -48,10 +154,30 @@
             {
                 @foreach (var wallet in Model)
                 {
+                    <!-- Calculate net amount using the enum values -->
+                    // Calculate the net amount using the enum values
+                    decimal netAmount = 0;
+
+                    if (wallet.Transactions != null && wallet.Transactions.Any())
+                    {
+                        decimal creditAmount = wallet.Transactions
+                        .Where(t => t.TransactionType == TransactionType.Credit)
+                        .Sum(t => t.Amount);
+
+                        decimal debitAmount = wallet.Transactions
+                        .Where(t => t.TransactionType == TransactionType.Debit)
+                        .Sum(t => t.Amount);
+
+                        netAmount = creditAmount - debitAmount;
+                    }
+
+                    var isPositive = netAmount >= 0;
+                    var formattedAmount = Math.Abs(netAmount).ToString("N2");
+
+
                     <div class="col-md-6 col-lg-4 wallet-item fade-in" data-name="@wallet.Name.ToLower()">
                         <div class="wallet-card card border-0 shadow-sm h-100">
                             <div class="card-body p-0">
-                                <!-- Card Header -->
                                 <div class="wallet-card-header d-flex justify-content-between align-items-center p-3 border-bottom">
                                     <div class="d-flex align-items-center">
                                         <div class="wallet-icon-container bg-primary-subtle rounded-circle me-2">
@@ -69,11 +195,7 @@
                                                     <i class="fas fa-edit me-2 text-primary"></i> Edit
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item d-flex align-items-center" asp-action="Details" asp-route-id="@wallet.Id">
-                                                    <i class="fas fa-info-circle me-2 text-info"></i> Details
-                                                </a>
-                                            </li>
+                                         
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
                                                 <a class="dropdown-item d-flex align-items-center text-danger" asp-action="Delete" asp-route-id="@wallet.Id">
@@ -86,6 +208,17 @@
 
                                 <!-- Card Content -->
                                 <div class="wallet-card-content p-3 card-clickable" data-url='@Url.Action("Index", "UserTransactions", new { id = wallet.Id })'>
+                                    <!-- Balance Display -->
+                                    <div class="wallet-balance mb-3">
+                                        <div class="text-muted small mb-1">Current Balance</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <h4 class="fw-bold @(isPositive ? "text-success" : "text-danger") mb-0">
+                                                @(isPositive ? "+" : "-") @formattedAmount
+                                            </h4>
+                                            <span class="ms-2 text-muted small">@wallet.Currency.Code</span>
+                                        </div>
+                                    </div>
+
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="badge bg-primary-subtle text-primary">
                                             <i class="fas fa-money-bill-wave me-1"></i> @wallet.Currency.Code
@@ -105,10 +238,10 @@
 
                                 <!-- Card Footer -->
                                 <div class="wallet-card-footer d-flex border-top">
-                                    <a href="@Url.Action("Create", "UserTransactions", new { id = wallet.Id, createdType = "receive" })" class="flex-grow-1 btn btn-light border-end rounded-0 py-2">
+                                    <a href="@Url.Action("Create", "UserTransactions", new { walletId = wallet.Id, createdType = "receive" })" class="flex-grow-1 btn btn-light border-end rounded-0 py-2">
                                         <i class="fas fa-arrow-down text-success me-1"></i> Cash In
                                     </a>
-                                    <a href="@Url.Action("Create", "UserTransactions", new { id = wallet.Id, createdType = "send" })" class="flex-grow-1 btn btn-light rounded-0 py-2">
+                                    <a href="@Url.Action("Create", "UserTransactions", new { walletId = wallet.Id, createdType = "send" })" class="flex-grow-1 btn btn-light rounded-0 py-2">
                                         <i class="fas fa-arrow-up text-danger me-1"></i> Cash Out
                                     </a>
                                 </div>
@@ -259,6 +392,42 @@
         font-weight: 600;
     }
 
+    /* Wallet Summary Dashboard */
+    .wallet-summary-dashboard {
+        margin-bottom: 1.5rem;
+    }
+
+        .wallet-summary-dashboard .card {
+            transition: all 0.3s ease;
+        }
+
+            .wallet-summary-dashboard .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            }
+
+    .dashboard-card .icon-shape {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.25rem;
+    }
+
+    .bg-light-success {
+        background-color: var(--light-success);
+    }
+
+    .bg-light-danger {
+        background-color: var(--light-danger);
+    }
+
+    .bg-light-primary {
+        background-color: var(--light-primary);
+    }
+
     /* Card styling */
     .card {
         border-radius: 0.75rem;
@@ -277,6 +446,22 @@
 
     .wallet-card-content {
         cursor: pointer;
+    }
+
+    /* Balance styling */
+    .wallet-balance {
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+        .wallet-balance:hover {
+            background-color: #f0f0f0;
+        }
+
+    .wallet-card-content:hover .wallet-balance {
+        background-color: #f0f0f0;
     }
 
     /* Icon styling */
@@ -404,9 +589,4 @@
         border-left: none;
     }
 
-    /* Animation */
-    
-    .fade-in {
-        animation: fadeIn 0.3s ease forwards;
-    }
 </style>

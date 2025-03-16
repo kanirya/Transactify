@@ -26,6 +26,9 @@ namespace Hostel_Management.Models.Model
         [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
 
+        public virtual List<UserTransaction> Transactions { get; set; } = new List<UserTransaction>();
+
+
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
