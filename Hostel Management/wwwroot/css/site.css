@@ -10,7 +10,7 @@
     --border-color: #e9ecef;
     --text-muted: #6c757d;
     --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    --sidebar-width: 260px;
+    --sidebar-width: 220px;
     --sidebar-collapsed-width: 70px;
     --header-height: 60px;
     --body-bg: #f8f9fa;
@@ -22,7 +22,43 @@ body {
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
-    padding-bottom: 20px;
+    padding-bottom: 18px;
+    font-size:14px;
+}
+
+
+.text-mid{
+    font-size:15px;
+}
+.text-logo{
+    font-size:18px;
+}
+
+.hide-on-small{
+    display:block;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    .hide-on-small{
+        display:none;
+    }
+    .text-mid{
+        font-size:13px;
+    }
+    .text-logo{font-size:15px;
+
+    }
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .btn-primary {
+        padding: 0.5rem 1rem;
+    }
 }
 
 /* Header Styles */
@@ -60,6 +96,21 @@ body {
         justify-content: center;
         margin-right: 10px;
     }
+@media (max-width: 768px) { /* Adjust 768px to your desired breakpoint */
+    .app-header .brand-icon {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    #dropdownMenu-profile {
+        width: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px; /* Adjust based on font size */
+    }
+}
 
 .toggle-btn {
     width: 36px;
@@ -85,7 +136,9 @@ body {
     position: fixed;
     top: var(--header-height);
     left: 0;
-    height: calc(100vh - var(--header-height));
+   height: 500px;
+    border-top-right-radius:10px;
+    border-bottom-right-radius:10px;
     width: var(--sidebar-width);
     background-color: white;
     box-shadow: 2px 0 10px rgba(0,0,0,0.05);
@@ -206,6 +259,12 @@ body {
 .content {
     padding: 1.5rem;
 }
+@media(max-width:520px) {
+    .content {
+        padding: 0rem;
+    }
+}
+
 
 /* User Menu */
 .user-menu {
