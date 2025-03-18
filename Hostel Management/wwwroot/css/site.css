@@ -25,23 +25,47 @@ body {
     padding-bottom: 18px;
     font-size:14px;
 }
+#dropdownMenu-profile {
+    background-color: #7d5675 !important; /* Adjust to match the exact color */
+    color: white !important;
+    padding: 6px 12px; /* Adjust padding */
+    border-radius: 8px; /* Make it rounded */
+    border: none; /* Remove any border */
+    font-weight: bold; /* Make text bold */
+}
+
+    #dropdownMenu-profile:hover {
+        background-color: #6a4863 !important; /* Slightly darker on hover */
+    }
+
 
 
 .text-mid{
     font-size:15px;
 }
 .text-logo{
-    font-size:18px;
+    font-size:20px;
 }
 
 .hide-on-small{
     display:block;
 }
 
-@media (max-width: 768px) {
+.heading-text{
+    font-size:23px;
+}
+
+
+
+@media (max-width: 600px) {
     body {
         font-size: 16px;
     }
+
+    .heading-text {
+        font-size: 17px;
+    }
+
 
     .hide-on-small{
         display:none;
@@ -49,7 +73,7 @@ body {
     .text-mid{
         font-size:13px;
     }
-    .text-logo{font-size:15px;
+    .text-logo{font-size:16px;
 
     }
     .auth-card {
@@ -430,3 +454,45 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* Action Buttons */
+
+.action-button {
+    flex: 1;
+    max-width: 200px;
+    padding: 0.85rem 1rem;
+    text-decoration:none;
+    border-radius: 10px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-add-cash {
+    background-color: var(--light-success);
+    color: var(--success-color);
+    border: none;
+}
+
+    .btn-add-cash:hover {
+        background-color: var(--success-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+.btn-send-money {
+    background-color: var(--light-primary);
+    color: var(--primary-color);
+    border: none;
+}
+
+    .btn-send-money:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+    }

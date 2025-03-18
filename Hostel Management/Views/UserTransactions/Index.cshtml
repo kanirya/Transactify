@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Transactions";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    int itemsPerPage = 30; // Number of transactions per page
+    int itemsPerPage = 30; 
 }
 
 <div class="transaction-dashboard py-4">
@@ -12,41 +12,47 @@
         <!-- Page Header -->
         <div class="page-header d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="h3 mb-1 fw-bold text-primary">Transaction History</h1>
-                <p class="text-muted mb-0">Manage and track your financial activities</p>
+                <h1 class="h3 mb-1 fw-bold text-primary heading-text">Transaction History</h1>
+                <p class="text-muted mb-0 text-mid">Manage and track your financial activities</p>
             </div>
-            <div class="d-flex gap-2">
-                <button id="filterToggle" class="btn btn-light">
-                    <i class="fas fa-filter me-2"></i>Filters
-                </button>
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-plus me-2"></i>Actions
+            <div class="row">
+               
+                <div class="col-sm-6 mt-1">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle text-mid" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-plus me-2"></i>Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="actionDropdown">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })">
+                                    <i class="fas fa-arrow-down text-success me-2"></i> Cash In
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })">
+                                    <i class="fas fa-arrow-up text-danger me-2"></i> Cash Out
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#" id="exportCsv">
+                                    <i class="fas fa-file-csv me-2 text-primary"></i> Export CSV
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#" id="printReport">
+                                    <i class="fas fa-print me-2 text-primary"></i> Print Report
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+</div>
+                <div class="col-sm-6 mt-1">
+                    <button id="filterToggle" class="btn btn-light text-mid">
+                        <i class="fas fa-filter me-2"></i>Filters
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="actionDropdown">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })">
-                                <i class="fas fa-arrow-down text-success me-2"></i> Cash In
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })">
-                                <i class="fas fa-arrow-up text-danger me-2"></i> Cash Out
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#" id="exportCsv">
-                                <i class="fas fa-file-csv me-2 text-primary"></i> Export CSV
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#" id="printReport">
-                                <i class="fas fa-print me-2 text-primary"></i> Print Report
-                            </a>
-                        </li>
-                    </ul>
                 </div>
+              
             </div>
         </div>
 
@@ -103,7 +109,7 @@
 
         <!-- Dashboard Cards -->
         <div class="row g-4 mb-4">
-            <div class="col-md-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4 col-xl-3">
                 <div class="card border-0 shadow-sm h-100 dashboard-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -123,7 +129,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4 col-xl-3">
                 <div class="card border-0 shadow-sm h-100 dashboard-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -143,7 +149,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4 col-xl-3">
                 <div class="card border-0 shadow-sm h-100 dashboard-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -166,7 +172,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4 col-xl-3">
                 <div class="card border-0 shadow-sm h-100 dashboard-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -235,7 +241,7 @@
                                             @(string.IsNullOrEmpty(item.Note) ? "-" : item.Note)
                                         </div>
                                     </td>
-                                    <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>@item.CreatedAt.ToString("MMM dd, yyyy HH:mm tt")</td>
                                     <td class="text-end pe-4">
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -303,13 +309,14 @@
 
 <!-- Floating Action Buttons -->
 <div class="action-buttons">
-    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })" class="btn btn-success btn-circle" data-bs-toggle="tooltip" data-bs-placement="left" title="Cash In">
-        <i class="fas fa-arrow-down"></i>
+    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "receive" })" class=" action-button btn-add-cash " data-bs-toggle="tooltip" data-bs-placement="left" title="Cash In">
+        <i class="fas fa-arrow-down"></i>Receive
     </a>
-    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })" class="btn btn-danger btn-circle" data-bs-toggle="tooltip" data-bs-placement="left" title="Cash Out">
-        <i class="fas fa-arrow-up"></i>
+    <a href="@Url.Action("Create", new { walletId = ViewBag.Id, createdType = "send" })" class="action-button btn-send-money" data-bs-toggle="tooltip" data-bs-placement="left" title="Cash Out">
+        <i class="fas fa-arrow-up"></i>Send
     </a>
 </div>
+
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>

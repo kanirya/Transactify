@@ -42,7 +42,6 @@
 
 <div class="wallet-dashboard py-4">
     <div class="container">
-        <!-- Page Header -->
         <div class="page-header d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h3 mb-1 fw-bold text-primary">My Wallets</h1>
@@ -53,7 +52,6 @@
             </a>
         </div>
 
-        <!-- Wallet Summary Dashboard -->
         <div class="wallet-summary-dashboard mb-4 fade-in">
             <div class="row g-3">
                 <div class="col-md-4">
@@ -124,7 +122,6 @@
             </div>
         </div>
 
-        <!-- Simple Search Box -->
         <div class="search-container card border-0 shadow-sm mb-4 fade-in">
             <div class="card-body p-3">
                 <div class="input-group">
@@ -139,7 +136,6 @@
             </div>
         </div>
 
-        <!-- Results Summary -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="results-info">
                 <span class="badge bg-light-primary text-primary px-3 py-2 rounded-pill">
@@ -148,14 +144,11 @@
             </div>
         </div>
 
-        <!-- Wallet Cards -->
         <div class="row g-4" id="walletGrid">
             @if (Model.Any())
             {
                 @foreach (var wallet in Model)
                 {
-                    <!-- Calculate net amount using the enum values -->
-                    // Calculate the net amount using the enum values
                     decimal netAmount = 0;
 
                     if (wallet.Transactions != null && wallet.Transactions.Any())
@@ -206,9 +199,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Card Content -->
                                 <div class="wallet-card-content p-3 card-clickable" data-url='@Url.Action("Index", "UserTransactions", new { id = wallet.Id })'>
-                                    <!-- Balance Display -->
                                     <div class="wallet-balance mb-3">
                                         <div class="text-muted small mb-1">Current Balance</div>
                                         <div class="d-flex align-items-baseline">
@@ -236,7 +227,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Card Footer -->
                                 <div class="wallet-card-footer d-flex border-top">
                                     <a href="@Url.Action("Create", "UserTransactions", new { walletId = wallet.Id, createdType = "receive" })" class="flex-grow-1 btn btn-light border-end rounded-0 py-2">
                                         <i class="fas fa-arrow-down text-success me-1"></i> Cash In
@@ -283,10 +273,8 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Card click functionality
         document.querySelectorAll(".card-clickable").forEach(function (card) {
             card.addEventListener("click", function (event) {
                 if (!event.target.closest(".dropdown, button, a")) {
@@ -295,7 +283,6 @@
             });
         });
 
-        // Search functionality
         const searchInput = document.getElementById('walletSearch');
         const clearSearch = document.getElementById('clearSearch');
         const walletItems = document.querySelectorAll('.wallet-item');
@@ -303,12 +290,10 @@
         const walletCount = document.getElementById('walletCount');
         const clearFilters = document.getElementById('clearFilters');
 
-        // Live search as user types
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase().trim();
             filterWallets(searchTerm);
 
-            // Show/hide clear button
             if (searchTerm.length > 0) {
                 clearSearch.classList.remove('d-none');
             } else {
@@ -316,7 +301,6 @@
             }
         });
 
-        // Clear search button
         clearSearch.addEventListener('click', function() {
             searchInput.value = '';
             filterWallets('');
@@ -324,14 +308,12 @@
             searchInput.focus();
         });
 
-        // Clear filters from empty state
         clearFilters.addEventListener('click', function() {
             searchInput.value = '';
             filterWallets('');
             clearSearch.classList.add('d-none');
         });
 
-        // Filter wallets function
         function filterWallets(searchTerm) {
             let visibleCount = 0;
 
@@ -346,14 +328,11 @@
                 }
             });
 
-            // Update wallet count
             walletCount.textContent = visibleCount;
 
-            // Show/hide no wallets message
             noWalletsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
         }
 
-        // Add highlight to search box on focus
         searchInput.addEventListener('focus', function() {
             this.parentElement.parentElement.classList.add('search-focused');
         });
@@ -365,7 +344,6 @@
 </script>
 
 <style>
-    /* Modern wallet dashboard styling */
     :root {
         --primary-color: #714B67;
         --primary-hover: #5D3E56;
@@ -386,13 +364,11 @@
         color: #212529;
     }
 
-    /* Page header */
     .page-header h1 {
         color: var(--primary-color);
         font-weight: 600;
     }
 
-    /* Wallet Summary Dashboard */
     .wallet-summary-dashboard {
         margin-bottom: 1.5rem;
     }
@@ -428,7 +404,6 @@
         background-color: var(--light-primary);
     }
 
-    /* Card styling */
     .card {
         border-radius: 0.75rem;
         overflow: hidden;
@@ -448,7 +423,6 @@
         cursor: pointer;
     }
 
-    /* Balance styling */
     .wallet-balance {
         padding: 0.75rem;
         background-color: #f8f9fa;
@@ -464,7 +438,6 @@
         background-color: #f0f0f0;
     }
 
-    /* Icon styling */
     .wallet-icon-container {
         width: 32px;
         height: 32px;
@@ -473,7 +446,6 @@
         justify-content: center;
     }
 
-    /* Button styling */
     .btn {
         font-weight: 500;
         border-radius: 0.5rem;
@@ -513,7 +485,6 @@
             background-color: #f0f0f0;
         }
 
-    /* Badge styling */
     .badge {
         font-weight: 500;
         padding: 0.35em 0.65em;
@@ -543,8 +514,6 @@
     .text-danger {
         color: var(--danger-color) !important;
     }
-
-    /* Empty state styling */
     .empty-state {
         border-radius: 0.75rem;
     }
@@ -552,8 +521,6 @@
     .empty-state-icon {
         color: #dee2e6;
     }
-
-    /* Search box styling */
     .search-container {
         border-radius: 0.75rem;
         transition: all 0.3s ease;
