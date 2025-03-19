@@ -5,36 +5,220 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<style>
+  
+    :root {
+        --primary-color: #714B67;
+        --primary-hover: #5D3E56;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --light-success: #e6f7e9;
+        --light-danger: #fbe7e9;
+        --light-primary: #f0e8f0;
+        --border-color: #e9ecef;
+        --text-muted: #6c757d;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
 
-<h4>Wallet</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label for="Name" class="control-label font-weight-bold">Custom Name Label</label>
-                <input asp-for="Name" class="form-control" placeholder="Enter Name" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
+    body {
+        font-family: 'Inter', 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+    }
 
-            <div class="form-group">
-                <label for="ConnectedUserId" class="control-label font-weight-bold">Connected User</label>
-                <select id="connectedUserDropdown" asp-for="ConnectedUserId" class="form-control border-primary shadow-sm" asp-items="ViewBag.ConnectedUserId">
-                    <option value=""> Select Connected User </option>
-                </select>
-            </div>
+    .wallet-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    /* Card styling */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+    }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1.25rem 1.5rem;
+    }
+
+        .card-header h5 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+    /* Form styling */
+    .form-label {
+        color: #495057;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-color: var(--border-color);
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.5rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(113, 75, 103, 0.15);
+        }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: var(--border-color);
+        border-radius: 0.5rem;
+    }
+
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Button styling */
+    .btn {
+        font-weight: 500;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #ced4da;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+    /* Breadcrumb styling */
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--text-muted);
+    }
+
+    /* List group styling */
+    .list-group-item {
+        padding: 1rem 1.5rem;
+        border-left: none;
+        border-right: none;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+    /* Currency icon */
+    .currency-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Page header styling */
+    .page-header h1 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+
+</style>
+
+
+<div class="wallet-form-container">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 fw-bold text-primary">Create New Wallet</h1>
+            <p class="text-muted mb-0">Add a new wallet to manage your finances</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-wallet text-primary me-2"></i>
+                        Wallet Details
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-medium">Wallet Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-tag text-muted"></i>
+                                </span>
+                                <input asp-for="Name" class="form-control" placeholder="Enter wallet name" required />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                            <div class="form-text">Choose a descriptive name for your wallet (e.g., "Personal Savings", "Travel Fund")</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="ConnectedUserId" class="form-label fw-medium">Connected User</label>
+                       <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-user text-muted"></i>
+                                </span>
+                                <select id="connectedUserDropdown" asp-for="ConnectedUserId" class="form-control border-primary shadow-sm" asp-items="ViewBag.ConnectedUserId">
+                                    <option value=""> Select Connected User </option>
+                                </select>
+                       </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+</div>
+</div>
 </div>
 
 
