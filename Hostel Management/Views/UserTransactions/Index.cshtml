@@ -48,7 +48,13 @@
                     </div>
 </div>
                 <div class="col-sm-6 mt-1">
-                    <button id="filterToggle" class="btn btn-light text-mid">
+                    <button onclick="
+                        if(document.getElementById('filterPane').style.display=='block'){
+                        document.getElementById('filterPane').style.display='none';
+                            }else
+                {
+                        document.getElementById('filterPane').style.display='block';}
+                        " class="btn btn-light text-mid">
                         <i class="fas fa-filter me-2"></i>Filters
                     </button>
                 </div>
@@ -57,7 +63,7 @@
         </div>
 
         <!-- Filter Panel -->
-        <div id="filterPanel" class="card border-0 shadow-sm mb-4" style="display: none;">
+        <div id="filterPane" class="card border-0 shadow-sm mb-4" style="display: none;">
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
                     <div class="col-md-3">
