@@ -48,13 +48,7 @@
                     </div>
 </div>
                 <div class="col-sm-6 mt-1">
-                    <button onclick="
-                        if(document.getElementById('filterPane').style.display=='block'){
-                        document.getElementById('filterPane').style.display='none';
-                            }else
-                {
-                        document.getElementById('filterPane').style.display='block';}
-                        " class="btn btn-light text-mid">
+                    <button id="filterToggle" class="btn btn-light text-mid">
                         <i class="fas fa-filter me-2"></i>Filters
                     </button>
                 </div>
@@ -63,7 +57,7 @@
         </div>
 
         <!-- Filter Panel -->
-        <div id="filterPane" class="card border-0 shadow-sm mb-4" style="display: none;">
+        <div id="filterPanel" class="card border-0 shadow-sm mb-4" style="display: none;">
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
                     <div class="col-md-3">
@@ -380,7 +374,7 @@
 
             // Toggle filter panel with animation
             $('#filterToggle').click(function() {
-                $('#filterPanel').slideToggle(300);
+                $('#filterPanel').slideToggle(500);
                 $(this).toggleClass('active');
             });
 
@@ -521,8 +515,6 @@
                 } else {
                     $('#noResultsMessage').addClass('d-none');
                 }
-
-                // Reset pagination
                 currentPage = 1;
                 initPagination();
                 showPage(currentPage);
@@ -866,7 +858,7 @@
                     doc.setFontSize(8);
                     doc.setTextColor(150, 150, 150);
                     doc.text(`Page ${i} of ${pageCount}`, 196, 285, { align: 'right' });
-                    doc.text('© Hostel Management System', 14, 285);
+                    doc.text('© Transaction System', 14, 285);
                 }
 
                 // Save the PDF

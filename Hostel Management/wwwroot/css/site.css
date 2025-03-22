@@ -482,7 +482,7 @@ body {
     .btn-add-cash:hover {
         background-color: var(--success-color);
         color: white;
-        transform: translateY(-3px);
+        transform: translateY(-3px) scale(1.02);
     }
 
 .btn-send-money {
@@ -494,5 +494,5 @@ body {
     .btn-send-money:hover {
         background-color: var(--primary-color);
         color: white;
-        transform: translateY(-3px);
+        transform: translateY(-3px) scale(1.02);
     }
