@@ -11,11 +11,11 @@ using Hostel_Management.Models.Model;
 namespace Hostel_Management.Areas.EBanking.Controllers
 {
     [Area("EBanking")]
-    public class WalletsController : Controller
+    public class WalletController : Controller
     {
         private readonly AuthDbContext _context;
 
-        public WalletsController(AuthDbContext context)
+        public WalletController(AuthDbContext context)
         {
             _context = context;
         }

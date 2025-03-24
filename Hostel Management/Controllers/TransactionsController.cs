@@ -10,9 +10,11 @@ using Hostel_Management.Models.Model;
 using Hostel_Management.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Hostel_Management.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hostel_Management.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         private readonly AuthDbContext _context;
