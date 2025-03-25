@@ -851,7 +851,6 @@
                     y += 8;
                 });
 
-                // Add footer
                 const pageCount = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= pageCount; i++) {
                     doc.setPage(i);
@@ -861,10 +860,10 @@
                     doc.text('© Transaction System', 14, 285);
                 }
 
-                // Save the PDF
+               
                 doc.save('transaction_report.pdf');
 
-                // Remove loading indicator
+               
                 $('#pdfLoading').remove();
             }
         });
