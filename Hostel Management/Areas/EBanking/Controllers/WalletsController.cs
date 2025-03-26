@@ -12,9 +12,10 @@ using Microsoft.AspNetCore.Identity;
 using Hostel_Management.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Hostel_Management.Controllers
+namespace Hostel_Management.Areas.EBanking.Controllers
 {
     [Authorize]
+    [Area("EBanking")]
     public class WalletsController : Controller
     {
         private readonly AuthDbContext _context;

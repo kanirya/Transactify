@@ -1,4 +1,5 @@
 ﻿@model Hostel_Management.Models.Model.Transaction
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Create Transaction";
@@ -48,8 +49,10 @@
             </div>
 
             <div class="text-center mt-3">
+
                 <a asp-action="Index" asp-route-id="@ViewBag.WalletId" class="text-muted">← Back to List</a>
             </div>
+            
         </div>
     </div>
 </div>

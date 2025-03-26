@@ -44,7 +44,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area:exists}/{controller=Wallets}/{action=Index}/{id?}");
+    pattern: "{area:exists?}/{controller=Wallets}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
