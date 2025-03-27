@@ -41,14 +41,14 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{area:exists?}/{controller=Wallets}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=UserWallets}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=UserWallets}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();

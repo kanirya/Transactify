@@ -25,7 +25,7 @@ namespace Hostel_Management.Controllers.Users
             _userManager = userManager;
         }
 
-        // GET: UserWallets
+       
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
